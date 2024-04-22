@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "public/placeHolder"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "public/placeHolder", "app/login/page.jsx", "app/page.jsx", "app/forgot-password/page.jsx", "app/layout.jsx", "app/register/page.jsx"],
   "exclude": ["node_modules"]
 }
