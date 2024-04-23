@@ -36,7 +36,7 @@ const ChessPiece = ({ type, position, board, movePiece, color }) => {
   };
 
   // Xử lý tìm kiếm nước đi hợp lệ cho quân cờ
-  const handleClick = () => {
+  const getValidMoves = () => {
     const validMoves = [];
     // Quân xe
     if (type === 'chariot') {
@@ -211,16 +211,10 @@ if (type === 'advisor') {
             }
         }
     }
-    
-    // Di chuyển quân cờ đến một vị trí hợp lệ ngẫu nhiên
-    if (validMoves.length > 0) {
-        const randomIndex = Math.floor(Math.random() * validMoves.length);
-        board.movePiece(position, validMoves[randomIndex]);
-    }
   };
 
   return (
-    <div onClick={handleClick}>
+    <div>
       <img src={display[type][color]} alt={type} />
     </div>
   );

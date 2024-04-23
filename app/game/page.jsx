@@ -6,6 +6,7 @@ import NewGame from "@/components/lobby/NewGame";
 import Leaderboard from "@/components/lobby/Leaderboard";
 import { useRouter } from "next/router";
 import Chat from "@/components/game/Chat";
+import GameBoard from "./GameBoard";
 
 const Game = () => {
 	const buttonsInformation = [
@@ -50,7 +51,7 @@ const Game = () => {
 				<Image src="/assets/logout.svg" width={45} height={45} />
 			</button>
 			<div className="xl:block hidden w-[854px] bg-red-300">
-				Bàn cờ + player
+				<GameBoard/>
 			</div>
 
 			<div className="flex items-center justify-center my-11">
