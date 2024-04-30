@@ -6,8 +6,30 @@ import NewGame from "@/components/lobby/NewGame";
 import History from "@/components/lobby/History";
 import Leaderboard from "@/components/lobby/Leaderboard";
 import { useRouter } from "next/router";
+import {useSocket} from "@/hook/SocketHook"
+import {useSession} from "@/hook/AuthHook"
+import { io } from "socket.io-client";
 
 const Lobby = () => {
+	const user = useSession((state)=> state.user)
+	const socket = useSocket((state)=> state.socket)
+	const setSocket = useSocket((state)=> state.setSocket)
+	const onlineUsers = useSocket((state)=> state.onlineUsers)
+	const setOnlineUsers = useSocket((state)=> state.setOnlineUsers)
+	useEffect(()=>{
+		const newSocket = io("https://chinesechess-socket.onrender.com")
+		setSocket(newSocket)
+		return ()=>{
+			newSocket.disconnect()
+		}
+	}, [])
+	useEffect(()=>{
+		if(socket == null) return
+		socket.emit("addOnlineUser", user.id)
+		socket.on ("getOnlineUsers", (users)=>{
+			setOnlineUsers(users)
+		})
+	}, [socket])
 	const buttonsInformation = [
 		{
 			iconReg: "/assets/plus-fill-reg.svg",

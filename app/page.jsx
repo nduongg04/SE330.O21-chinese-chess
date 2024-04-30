@@ -3,9 +3,10 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
+import {useSession} from "@/hook/AuthHook"
 const Home = () => {
 	const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
-
+	const setUser = useSession((state)=> state.setUser)
 	const [isLoading, setIsLoading] = useState(false);
 
 	const router = useRouter();
@@ -39,6 +40,7 @@ const Home = () => {
 					localStorage.setItem("accessToken", data.access_token);
 					console.log(data);
 					setTimeout(() => {
+						setUser(data.data)
 						setIsLoading(false);
 						router.push("/lobby");
 					}, 3300);

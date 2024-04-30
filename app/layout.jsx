@@ -6,7 +6,6 @@ const inter = Inter({
 	display: "swap",
 	variable: "--font-inter",
 });
-
 const permanent_maker = Permanent_Marker({
 	weight: "400",
 	subsets: ["latin"],
