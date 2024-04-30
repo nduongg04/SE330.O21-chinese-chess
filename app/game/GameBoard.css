@@ -1,0 +1,47 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Adjust this value according to your needs */
+}
+
+.chess-board {
+  display: grid;
+  grid-template-columns: repeat(9, 60px);
+  grid-template-rows: repeat(10, 60px);
+  background-image: url('./GameBoard.png');
+  background-size: contain;
+  width: 540px; 
+  height: 600px; 
+}
+
+.cell {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+.chess-piece {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.chess-piece img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+}
+
+.cell.valid-move {
+  width: 60px;
+  height: 60px;
+  align-items: flex-start;
+  border-radius: 50%;
+  background-color: rgb(44, 44, 235);
+}
+
+.chess-piece.selected {
+  border: 2px solid yellow;
+}
