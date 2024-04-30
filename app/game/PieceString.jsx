@@ -1,6 +1,6 @@
 // ImagePaths.js
 const ImagePaths = {
-    chessdemo: './game/ic_author.png',
+    chessdemo: '/assets/black-color.svg',
   };
   
   export default ImagePaths;
