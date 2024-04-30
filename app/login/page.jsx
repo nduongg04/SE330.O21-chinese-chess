@@ -4,13 +4,18 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {useSession} from "@/hook/AuthHook"
 
 const Login = () => {
+	const setUser = useSession((state)=> state.setUser)
 	useEffect(() => {
 		const getRefreshToken = () => {
 			const refreshToken = localStorage.getItem("refreshToken");
 
 			if (refreshToken) {
+				const user = JSON.parse(localStorage.getItem("user"));
+				console.log(user)
+				setUser(user)
 				router.push("/lobby");
                 return;
 			}
@@ -51,6 +56,8 @@ const Login = () => {
 				const data = await response.json();
 				localStorage.setItem("accessToken", data.access_token);
 				localStorage.setItem("refreshToken", data.refresh_token);
+				localStorage.setItem("user",JSON.stringify(data.data))
+				setUser(data.data)
 				router.push("/lobby");
 			}
 		} catch (error) {
