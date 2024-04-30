@@ -1,7 +1,11 @@
+import { useSession } from "@/hook/AuthHook";
+import { useSocket } from "@/hook/SocketHook";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const NewGame = () => {
+	const socket = useSocket((state)=> state.socket)
+	const user = useSession((state)=> state.user)
 	const times = [
 		{
 			time: 10,
@@ -16,11 +20,25 @@ const NewGame = () => {
 			text: "20 mins",
 		},
 	];
-
+	
 	const [selectedTime, setSelectedTime] = useState(0);
 	const [color, setColor] = useState("black");
-
-    const handleClickPlay = () => {};
+	const [textPlayButton, setTextPlayButton]= useState("Play")
+    const handleClickPlay = () => {
+		if(textPlayButton=="Play"){
+			if(socket==null) return
+			const data= {
+				min: times[selectedTime].time,
+				userID: user.id
+			}
+			socket.emit("findMatch", data)
+			setTextPlayButton("Cancel")
+		}
+		else{
+			socket.emit("cancelFindMatch", user.id)
+			setTextPlayButton("Play")
+		}
+	};
 
 	return (
 		<div className="h-full px-6 py-10 flex flex-col gap-4">
@@ -92,7 +110,7 @@ const NewGame = () => {
 			</div>
 
 			<button className="p-2 mt-auto h-[45px] rounded-lg bg-green-400 hover:text-xl hover:bg-green-500 text-white font-semibold text-lg" onClick={handleClickPlay}>
-				Play
+				{textPlayButton}
 			</button>
 		</div>
 	);
