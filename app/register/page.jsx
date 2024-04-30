@@ -4,11 +4,12 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import {useSession} from "@/hook/AuthHook"
 
 const Register = () => {
 	const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
 	const router = useRouter();
-
+	const setUser = useSession((state)=> state.setUser)
 	const [formData, setFormData] = useState({
 		email: "",
 		username: "",
@@ -24,6 +25,7 @@ const Register = () => {
 		const removeToken = () => {
 			localStorage.removeItem("accessToken");
 			localStorage.removeItem("refreshToken");
+			localStorage.removeItem("user")
 		};
 		removeToken();
 	}, []);
@@ -50,6 +52,8 @@ const Register = () => {
 				const data = await response.json();
 				localStorage.setItem("accessToken", data.access_token);
 				localStorage.setItem("refreshToken", data.refresh_token);
+				localStorage.setItem("user", JSON.stringify(data.data))
+				setUser(data.data)
 				router.push("/lobby");
 			} catch (error) {
 				setErrorMessage("Something went wrong. Please try again later.");

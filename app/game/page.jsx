@@ -6,7 +6,6 @@ import NewGame from "@/components/lobby/NewGame";
 import Leaderboard from "@/components/lobby/Leaderboard";
 import { useRouter } from "next/router";
 import Chat from "@/components/game/Chat";
-
 const Game = () => {
 	const buttonsInformation = [
 		{
