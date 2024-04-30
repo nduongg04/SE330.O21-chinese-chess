@@ -9,7 +9,7 @@
   display: grid;
   grid-template-columns: repeat(9, 60px);
   grid-template-rows: repeat(10, 60px);
-  background-image: url('./GameBoard.png');
+  background-image: url('/assets/GameBoard.png');
   background-size: contain;
   width: 540px; 
   height: 600px; 
@@ -39,9 +39,9 @@
   height: 60px;
   align-items: flex-start;
   border-radius: 50%;
-  background-color: rgb(44, 44, 235);
+  opacity: 0.5;
+  background-color: rgb(78, 78, 243);
 }
-
-.chess-piece.selected {
-  border: 2px solid yellow;
+.cell.valid-move :hover {
+  background-color:rgb(79, 241, 100);
 }

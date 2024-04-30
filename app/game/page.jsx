@@ -50,7 +50,7 @@ const Game = () => {
 			>
 				<Image src="/assets/logout.svg" width={45} height={45} />
 			</button>
-			<div className="xl:block hidden w-[854px] bg-red-300">
+			<div className="xl:block hidden w-[854px]">
 				<GameBoard/>
 			</div>
 
