@@ -9,7 +9,7 @@
   display: grid;
   grid-template-columns: repeat(9, 60px);
   grid-template-rows: repeat(10, 60px);
-  background-image: url('./GameBoard.png');
+  background-image: url('/assets/GameBoard.png');
   background-size: contain;
   width: 540px; 
   height: 600px; 

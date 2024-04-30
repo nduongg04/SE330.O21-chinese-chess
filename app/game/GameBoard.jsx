@@ -27,6 +27,7 @@ const GameBoard = ()=> {
   let validMoves = [];
 
   const movePiece = (currentPosition, newPosition) => {
+    board[newPosition.x][newPosition.y] = null;
     board[newPosition.x][newPosition.y]=board[currentPosition.x][currentPosition.y];
     board[currentPosition.x][currentPosition.y] = null;
     board[newPosition.x][newPosition.y].position = {x: newPosition.x, y: newPosition.y};
@@ -90,7 +91,7 @@ const GameBoard = ()=> {
 // }
   
 
-  const handleOnMove = (event, position) =>{
+  const handleOnMove = ( position) =>{
         // Move the piece and switch the current player
         // If none of the above conditions are true, move the piece to the new position
         if (!isBeingCheck(currentPlayer, board)) {
@@ -135,7 +136,7 @@ const GameBoard = ()=> {
     console.log(board)
     console.log(board[x][y])
     if(isSelected && selectedPiece){
-      if((board[x][y] && (board[x][y].position != selectedPiece.position))){
+      if((board[x][y] && (board[x][y].position != selectedPiece.position && board[x][y].color === currentPlayer ))){
         selectedPiece = board[x][y];
       console.log(selectedPiece);
       validMoves.forEach(move => {
@@ -171,11 +172,11 @@ const GameBoard = ()=> {
         const isValidMove = validMoves.some(move => position.x === move.x && position.y === move.y);
         console.log(isValidMove)
         if(isValidMove){
-          handleOnMove(event,position);
+          handleOnMove(position);
         }   
       }
      
-    } else if( (board[x][y] && selectedPiece === null) )
+    } else if( (board[x][y] && selectedPiece === null && board[x][y].color === currentPlayer) )
     {
       isSelected = true;
       selectedPiece = board[x][y];

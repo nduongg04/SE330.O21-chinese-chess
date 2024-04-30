@@ -1,35 +1,19 @@
 // ImagePaths.js
-import BChariot from "./piece_assets/BChariot.png";
-import BHorse from "./piece_assets/BHorse.png";
-import BElephant from "./piece_assets/BElephant.png";
-import BGeneral from "./piece_assets/BGeneral.png";
-import BAdvisor from "./piece_assets/BAdvisor.png";
-import BCannon from "./piece_assets/BCannon.png";
-import BSoldier from "./piece_assets/BSoldier.png";
-import RChariot from "./piece_assets/RChariot.png";
-import RHorse from "./piece_assets/RHorse.png";
-import RElephant from "./piece_assets/RElephant.png";
-import RGeneral from "./piece_assets/RGeneral.png";
-import RAdvisor from "./piece_assets/RAdvisor.png";
-import RCannon from "./piece_assets/RCannon.png";
-import RSoldier from "./piece_assets/RSoldier.png";
 
 const ImagePaths = {
-  // For Black
-  BChariot,
-  BHorse,
-  BElephant,
-  BGeneral,
-  BAdvisor,
-  BCannon,
-  BSoldier,
-  // For Red
-  RChariot,
-  RHorse,
-  RElephant,
-  RGeneral,
-  RAdvisor,
-  RCannon,
-  RSoldier,
+   BChariot : "/assets/piece_assets/BChariot.png",
+   BHorse : "/assets/piece_assets/BHorse.png",
+   BElephant : "/assets/piece_assets/BElephant.png",
+   BGeneral : "/assets/piece_assets/BGeneral.png",
+   BAdvisor : "/assets/piece_assets/BAdvisor.png",
+   BCannon : "/assets/piece_assets/BCannon.png",
+   BSoldier : "/assets/piece_assets/BSoldier.png",
+   RChariot : "/assets/piece_assets/RChariot.png",
+   RHorse : "/assets/piece_assets/RHorse.png",
+   RElephant : "/assets/piece_assets/RElephant.png",
+   RGeneral : "/assets/piece_assets/RGeneral.png",
+   RAdvisor : "/assets/piece_assets/RAdvisor.png",
+   RCannon : "/assets/piece_assets/RCannon.png",
+   RSoldier : "/assets/piece_assets/RSoldier.png"
 }
 export default ImagePaths;
