@@ -135,7 +135,32 @@ const GameBoard = ()=> {
     console.log(board)
     console.log(board[x][y])
     if(isSelected && selectedPiece){
-      // If a piece is selected and the clicked cell is a valid move
+      if((board[x][y] && (board[x][y].position != selectedPiece.position))){
+        selectedPiece = board[x][y];
+      console.log(selectedPiece);
+      validMoves.forEach(move => {
+        const cell = document.getElementById(`cell-${move.x}-${move.y}`);
+        if (cell) {
+          cell.classList.remove('valid-move');
+        }
+      });
+      //Highlight the valid moves
+      validMoves = getValidMoves(selectedPiece, board);
+      //validMoves = filterCheckMoves(currentPlayer,validMoves, selectedPiece);
+      if(validMoves.length == 0){
+        isSelected = false;
+        selectedPiece = null;
+      }
+       console.log(validMoves)
+       validMoves.forEach(move => {
+         const cell = document.getElementById(`cell-${move.x}-${move.y}`);
+         if (cell) {
+           cell.classList.add('valid-move');
+         }
+       }
+       );
+      } else{
+           // If a piece is selected and the clicked cell is a valid move
         console.log(validMoves)
         const id = event.currentTarget.id;
         const parts = id.split('-');
@@ -148,8 +173,10 @@ const GameBoard = ()=> {
         if(isValidMove){
           handleOnMove(event,position);
         }   
-    } else if( (board[x][y] && selectedPiece === null) || 
-    (board[x][y] && (selectedPiece !== null && board[x][y].position != selectedPiece.position))){
+      }
+     
+    } else if( (board[x][y] && selectedPiece === null) )
+    {
       isSelected = true;
       selectedPiece = board[x][y];
       console.log(selectedPiece);

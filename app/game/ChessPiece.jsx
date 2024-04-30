@@ -1,52 +1,49 @@
 import React, { useEffect, useState } from 'react';
 import './GameBoard.css';
-import ImagePath from './PieceString';
+
+import ImagePaths from './PieceString'
 const ChessPiece = ({ type, position, color,handleOnClick}) => {
   const display = {
     'chariot': {
-        'red': ImagePath.chessdemo,
-        'black': ImagePath.chessdemo
+        'red': ImagePaths.RChariot,
+        'black': ImagePaths.BChariot
       },
       'advisor': {
-        'red': ImagePath.chessdemo,
-        'black': ImagePath.chessdemo
+        'red': ImagePaths.RAdvisor,
+        'black': ImagePaths.BAdvisor
       },
       'cannon': {
-        'red': ImagePath.chessdemo,
-        'black': ImagePath.chessdemo
+        'red': ImagePaths.RCannon,
+        'black': ImagePaths.BCannon
       },
       'soldier': {
-        'red': ImagePath.chessdemo,
-        'black': ImagePath.chessdemo
+        'red': ImagePaths.RSoldier,
+        'black': ImagePaths.BSoldier
       },
       'horse': {
-        'red': ImagePath.chessdemo,
-        'black': ImagePath.chessdemo
+        'red': ImagePaths.RHorse,
+        'black': ImagePaths.BHorse
       },
       'elephant': {
-        'red': ImagePath.chessdemo,
-        'black': ImagePath.chessdemo
+        'red': ImagePaths.RElephant,
+        'black': ImagePaths.BElephant
       },
       'general': {
-        'red': ImagePath.chessdemo,
-        'black': ImagePath.chessdemo
+        'red': ImagePaths.RGeneral,
+        'black': ImagePaths.BGeneral
       },
   };
   
-   const [isSelected, setisSelected] = useState(false);
-  // const handleOnClick = useEffect(()=>{
-  //   setisSelected(!isSelected)
-  // })
   return (
     <div
-      className={`chess-piece ${isSelected ? 'selected' : ''}`}
+      className={`chess-piece`}
       style={{
         gridRow: position.x + 1,
         gridColumn: position.y + 1,
       }}
       onClick={handleOnClick}
     >
-      <img src={display[type][color]} alt="" />
+      <img src= {display[type][color]} />
     </div>
   );
 };
