@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import NewGame from "@/components/lobby/NewGame";
 import History from "@/components/lobby/History";
 import Leaderboard from "@/components/lobby/Leaderboard";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import {useSocket} from "@/hook/SocketHook"
 import {useSession} from "@/hook/AuthHook"
 import { io } from "socket.io-client";
@@ -16,6 +16,8 @@ const Lobby = () => {
 	const setSocket = useSocket((state)=> state.setSocket)
 	const onlineUsers = useSocket((state)=> state.onlineUsers)
 	const setOnlineUsers = useSocket((state)=> state.setOnlineUsers)
+	const [isMatch, setIsMatch] = useState(false)
+	const router = useRouter();
 	useEffect(()=>{
 		const newSocket = io("https://chinesechess-socket.onrender.com")
 		setSocket(newSocket)
@@ -23,6 +25,24 @@ const Lobby = () => {
 			newSocket.disconnect()
 		}
 	}, [])
+	useEffect(()=>{
+		if(socket==null)return
+		console.log("I have passed here")
+		socket.on("getMatchData", (data)=>{
+			setIsMatch(true)
+		})
+
+		return ()=>{
+			socket.off("getMatchData")
+		}
+	}, [isMatch,socket])
+
+	useEffect(()=>{
+		console.log(isMatch)
+		if(isMatch){
+			router.push("/game")
+		}
+	}, [isMatch])
 	useEffect(()=>{
 		if(socket == null) return
 		socket.emit("addOnlineUser", user.id)
@@ -57,7 +77,6 @@ const Lobby = () => {
 	};
 
 	const handleLogout = () => {
-		const router = useRouter();
 		localStorage.removeItem("accessToken");
 		localStorage.removeItem("refreshToken");
 		router.push("/login");
