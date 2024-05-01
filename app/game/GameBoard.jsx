@@ -5,6 +5,7 @@ import getValidMoves from './getValidMoves';
 import Swal from 'sweetalert2'
 import { useSocket } from '@/hook/SocketHook';
 import { useSession } from '@/hook/AuthHook';
+import axios from 'axios';
 
 const GameBoard = ()=> {
   const [board, setBoard]  = useState( [
@@ -162,16 +163,11 @@ const GameBoard = ()=> {
   
 
   const handleOnMove = ( position) =>{
-        // Move the piece and switch the current player
-        // If none of the above conditions are true, move the piece to the new position
-        if (!isBeingCheck(currentPlayer, board)) {
-          if (selectedPiece) {
-            // Only try to move the piece if one is selected
-            movePiece(selectedPiece.position, position);
-            
-          //  setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
-          }
-        }
+      // Move the piece and switch the current player
+      // If none of the above conditions are true, move the piece to the new position
+      // Only try to move the piece if one is selected
+      movePiece(selectedPiece.position, position);   
+      //  setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
       // Unselect the piece and remove the highlights
       console.log("board: ", board)
       isSelected = false;
@@ -198,9 +194,11 @@ const GameBoard = ()=> {
           `
         }).then((result)=>{
           if(result.isConfirmed){
-            
+            console.log("the win")
           }
         })
+      } else {
+        console.log("check");
       }
     // Unselect the piece and remove the highlights
     isSelected = false; setIsYourTurn(false);
