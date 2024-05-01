@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ChessPiece from './ChessPiece';
 import './GameBoard.css';
 import getValidMoves from './getValidMoves';
-
+import Swal from 'sweetalert2'
 import { useSocket } from '@/hook/SocketHook';
 import { useSession } from '@/hook/AuthHook';
 
@@ -24,8 +24,6 @@ const GameBoard = ()=> {
   })))
   
   const [isYourTurn, setIsYourTurn] = useState(false);
-  const [isCheck,setIsCheck] = useState(false);
-  const [beingCheck, setBeingCheck]= useState(false);
   let isSelected = false;
   let selectedPiece = null;
   let validMoves = [];
@@ -90,43 +88,60 @@ const GameBoard = ()=> {
     });
   }
 
-  function isBeingCheck (currentPlayer, board) {
+  function isChecking (currentPlayer, board) {
     // Get the opponent's color
     const opponentColor = currentPlayer === 'red' ? 'black' : 'red';
-
+    let opponentGeneralPositon = null;
+    // Get position of opponent general
+    for (let x = 0; x < board.length; x++) {
+      for (let y = 0; y < board[x].length; y++) {
+          const opponentPiece = board[x][y];
+          // If there is a piece at this position and it is the opponent's general
+          if ((opponentPiece && opponentPiece.type === 'general' && opponentPiece.color === opponentColor)) {
+            opponentGeneralPositon = {x: x, y: y};
+          }
+      }
+    }
     // Loop through all the positions on the board
     for (let i = 0; i < board.length; i++) {
-        for (let j = 0; j < board[i].length; j++) {
-            const piece = board[i][j];
-
-            // If there is a piece at this position and it is the current player's
-            if (piece && piece.color === currentPlayer) {
-                // Get the valid moves for this piece
-                const validMoves = getValidMoves(piece,board);
-
-                // Loop through all the positions on the board again
-                for (let x = 0; x < board.length; x++) {
-                    for (let y = 0; y < board[x].length; y++) {
-                        const opponentPiece = board[x][y];
-
-                        // If there is a piece at this position and it is the opponent's general
-                        if (opponentPiece && opponentPiece.type === 'general' && opponentPiece.color === opponentColor) {
-                            // If one of the valid moves for the current player's piece is this position, return true
-                            if (validMoves.some(move => move[0] === x && move[1] === y)) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
+      for (let j = 0; j < board[i].length; j++) {
+          const piece = board[i][j];
+          // If there is a piece at this position and it is the current player's
+          if (piece && piece.color === currentPlayer) {
+            // Get the valid moves for this piece
+            let validMoves = getValidMoves(piece,board);
+            validMoves = filterCheckMoves(currentPlayer,validMoves,piece);
+            // If one of the valid moves for the current player's piece is this position, return true
+            if (validMoves.some(move => move[0] === opponentGeneralPositon.x && move[1] === opponentGeneralPositon.y)) {
+              return true;
+          } 
         }
+      }
     }
-
     // If none of the valid moves for any of the current player's pieces are the position of the opponent's general, return false
     return false;
   } 
 
-
+  function isCheckMate(currentPlayer, board){
+    // Get the opponent's color
+    const opponentColor = currentPlayer === 'red' ? 'black' : 'red';
+    const allValidMoves = [];
+    // Loop through all the positions on the board
+    for (let i = 0; i < board.length; i++) {
+      for (let j = 0; j < board[i].length; j++) {
+        const piece = board[i][j];
+        // If there is a piece at this position and it is the current player's
+        if (piece && piece.color === opponentColor) {
+          // Get the valid moves for this piece
+          let validMoves = getValidMoves(piece,board);
+          validMoves = filterCheckMoves(currentPlayer,validMoves,piece);
+          if(validMoves.length!= 0) allValidMoves.push(validMoves);
+        }
+      }
+    }
+    if(allValidMoves.length == 0) return true;
+    return false;
+  }
   function filterCheckMoves(currentPlayer, validMoves, piece) {
     // Copy the current board to a new variable to simulate the moves
     let simulatedBoard = board.map(row => row.map(piece => {
@@ -166,14 +181,26 @@ const GameBoard = ()=> {
           cell.classList.remove('valid-move');
         }
       });
-      const check = isBeingCheck(currentPlayer, board);
-      console.log(check)
-      if (check) {
-        // If the opponent's general is in check, alert the user
-        setIsCheck(true);
-        alert('Check!');
-      } else {
-        setIsCheck(false);
+      const checkmate = isCheckMate(currentPlayer, board);
+      if(checkmate){
+        console.log('win');
+        Swal.fire({
+          title: "You win the match!",
+          width: 600,
+          padding: "3em",
+          color: "#716add",
+          background: "#fff url(https://sweetalert2.github.io/images/trees.png)",
+          backdrop: `
+            rgba(0,0,123,0.4)
+            url("https://sweetalert2.github.io/images/nyan-cat.gif")
+            left top
+            no-repeat
+          `
+        }).then((result)=>{
+          if(result.isConfirmed){
+            
+          }
+        })
       }
     // Unselect the piece and remove the highlights
     isSelected = false; setIsYourTurn(false);
@@ -202,7 +229,7 @@ const GameBoard = ()=> {
         }
       });
       //Highlight the valid moves
-      validMoves = getValidMoves(selectedPiece, board);
+      validMoves = getValidMoves(selectedPiece, board); validMoves= filterCheckMoves(currentPlayer,validMoves,selectedPiece);
       //validMoves = filterCheckMoves(currentPlayer,validMoves, selectedPiece);
       if(validMoves.length == 0){
         isSelected = false;

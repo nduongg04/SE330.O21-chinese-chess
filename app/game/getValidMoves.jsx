@@ -181,10 +181,31 @@
           if ((color === 'red' && newRow >= 0 && newRow <= 2 && newCol >= 3 && newCol <= 5) || (color === 'black' && newRow >= 7 && newRow <= 9 && newCol >= 3 && newCol <= 5)) {
               if (board[newRow][newCol] === null || board[newRow][newCol].color !== color) {
                   validMoves.push({x: newRow, y: newCol});
+                  // Kiểm tra trống tướng 
+                  for (let i = 0; i < board.length; i++) {
+                    if (board[i][newCol] && board[i][newCol].type === 'general' && board[i][newCol].color !== color) {
+                        // There is another general in the same column, check if there are any pieces in between
+                        const start = Math.min(newRow.x, i);
+                        const end = Math.max(newRow.x, i);
+                        let isEmpty = true;
+                        for (let j = start + 1; j < end; j++) {
+                            if (board[j][newCol]) {
+                                isEmpty = false;
+                                break;
+                            }
+                        }
+                        // Không có quân ở giữa, trống tướng
+                        if (isEmpty) {
+                            validMoves.pop();
+                        }
+                        break;
+                    }
+                  }
               }
           }
       }
-  }
+        
+    }
     return validMoves;
   };
 
