@@ -25,6 +25,7 @@ const GameBoard = ()=> {
   })))
   
   const [isYourTurn, setIsYourTurn] = useState(false);
+ // const [isCheckMate, setIsCheckMate]= useState(false);
   let isSelected = false;
   let selectedPiece = null;
   let validMoves = [];
@@ -35,6 +36,7 @@ const GameBoard = ()=> {
 
   const socketIDOponent=()=>{
     console.log(matchData)
+    if(matchData === null) return
     if(matchData.user1.user.id== user.id){
       return matchData.user2.socketID
     }
@@ -48,11 +50,13 @@ const GameBoard = ()=> {
     return matchData.user2.color
   }
   const currentPlayer= myColor();
+  
   useEffect(()=>{
-    if(currentPlayer==='red') setIsYourTurn(true)
-  },[])
+    if(currentPlayer ==='red' ) setIsYourTurn(true)
+  })
+
   const handleClickSocket=(event)=>{
-    
+    console.log(isYourTurn)
     if(isYourTurn === false){
       return
     }
@@ -62,7 +66,7 @@ const GameBoard = ()=> {
   }
 
   useEffect(()=>{
-    if(socket==null) return
+    if(socket===null) return
     console.log("Board change")
     socket.on("getTurn", (newBoard)=>{
       console.log("Socket:",newBoard)
@@ -92,7 +96,7 @@ const GameBoard = ()=> {
   function isChecking (currentPlayer, board) {
     // Get the opponent's color
     const opponentColor = currentPlayer === 'red' ? 'black' : 'red';
-    let opponentGeneralPositon = null;
+    let opponentGeneralPositon = {x: 0, y:0};
     // Get position of opponent general
     for (let x = 0; x < board.length; x++) {
       for (let y = 0; y < board[x].length; y++) {
@@ -100,6 +104,8 @@ const GameBoard = ()=> {
           // If there is a piece at this position and it is the opponent's general
           if ((opponentPiece && opponentPiece.type === 'general' && opponentPiece.color === opponentColor)) {
             opponentGeneralPositon = {x: x, y: y};
+            console.log(opponentPiece)
+            break;
           }
       }
     }
@@ -110,10 +116,11 @@ const GameBoard = ()=> {
           // If there is a piece at this position and it is the current player's
           if (piece && piece.color === currentPlayer) {
             // Get the valid moves for this piece
-            let validMoves = getValidMoves(piece,board);
-            validMoves = filterCheckMoves(currentPlayer,validMoves,piece);
+            let piecevalidMoves = getValidMoves(piece,board);
+            console.log("currentPiece", piece);
             // If one of the valid moves for the current player's piece is this position, return true
-            if (validMoves.some(move => move[0] === opponentGeneralPositon.x && move[1] === opponentGeneralPositon.y)) {
+            if (piecevalidMoves.some(move => move.x === opponentGeneralPositon.x && move.y === opponentGeneralPositon.y)) {
+              console.log(true)
               return true;
           } 
         }
@@ -135,7 +142,7 @@ const GameBoard = ()=> {
         if (piece && piece.color === opponentColor) {
           // Get the valid moves for this piece
           let validMoves = getValidMoves(piece,board);
-          validMoves = filterCheckMoves(currentPlayer,validMoves,piece);
+          validMoves = filterCheckMoves(opponentColor,validMoves,piece);
           if(validMoves.length!= 0) allValidMoves.push(validMoves);
         }
       }
@@ -143,21 +150,27 @@ const GameBoard = ()=> {
     if(allValidMoves.length == 0) return true;
     return false;
   }
+
+
   function filterCheckMoves(currentPlayer, validMoves, piece) {
     // Copy the current board to a new variable to simulate the moves
     let simulatedBoard = board.map(row => row.map(piece => {
       return piece ? { ...piece, position: { ...piece.position } } : null;
     }));
-    console.log(simulatedBoard)
+    console.log("simu",simulatedBoard)
+    const opponentColor = currentPlayer === 'red' ? 'black' : 'red';
+    console.log('OPC',opponentColor)
     return validMoves.filter(move => {
         // Simulate the move
-        simulatedBoard[move[0]][move[1]] = piece;
-        simulatedBoard[piece.position[0]][piece.position[1]] = null;
+        console.log("piece", piece);
+        console.log(simulatedBoard[move.x][move.y]);
+        simulatedBoard[move.x][move.y] = piece;
+        simulatedBoard[piece.position.x][piece.position.y] = null;
+        console.log(simulatedBoard)
         // Check if the move would put the player in check
-        const wouldBeCheck = isBeingCheck(currentPlayer, simulatedBoard);
-
+        const wouldBeCheck = isChecking(opponentColor,simulatedBoard)
         // If the move would not put the player in check, it's a valid move
-        return wouldBeCheck;
+        return !wouldBeCheck;
     });
 }
   
@@ -198,13 +211,13 @@ const GameBoard = ()=> {
           }
         })
       } else {
-        console.log("check");
+        const check = isChecking(currentPlayer,board);
+        if(check){
+          console.log("check");
+        }
       }
     // Unselect the piece and remove the highlights
     isSelected = false; setIsYourTurn(false);
-    document.querySelectorAll('.valid-move').forEach(cell => {
-      cell.classList.remove('valid-move');
-    });
   }
   
   const handleClick = (event) => {
@@ -227,9 +240,9 @@ const GameBoard = ()=> {
         }
       });
       //Highlight the valid moves
-      validMoves = getValidMoves(selectedPiece, board); validMoves= filterCheckMoves(currentPlayer,validMoves,selectedPiece);
-      //validMoves = filterCheckMoves(currentPlayer,validMoves, selectedPiece);
-      if(validMoves.length == 0){
+      validMoves = getValidMoves(selectedPiece, board); 
+      validMoves= filterCheckMoves(currentPlayer,validMoves,selectedPiece);
+      if(validMoves.length === 0){
         isSelected = false;
         selectedPiece = null;
       }
@@ -254,7 +267,8 @@ const GameBoard = ()=> {
         console.log(isValidMove)
         if(isValidMove){
           handleOnMove(position);
-          console.log("socket:", board)
+          if(socket !== null){
+            console.log("socket:", board)
           const socketID = socketIDOponent()
           console.log(socketID)
           const data = {
@@ -263,6 +277,7 @@ const GameBoard = ()=> {
           }
           console.log(data.board)
           socket.emit("completeTurn", data)
+          }
         }   
       }
      
@@ -273,7 +288,7 @@ const GameBoard = ()=> {
       console.log(selectedPiece);
       //Highlight the valid moves
       validMoves = getValidMoves(selectedPiece, board);
-      //validMoves = filterCheckMoves(currentPlayer,validMoves, selectedPiece);
+      validMoves = filterCheckMoves(currentPlayer,validMoves, selectedPiece);
       if(validMoves.length == 0){
         isSelected = false;
         selectedPiece = null;
@@ -309,7 +324,7 @@ const GameBoard = ()=> {
                     type={piece.type}
                     position={{ x: i, y: j }}
                     color={piece.color}
-                    onClick={handleClick}
+                    onClick={handleClickSocket}
                   />
                 ) : null}
               </div>
