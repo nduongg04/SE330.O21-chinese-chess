@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ChessPiece from './ChessPiece';
 import './GameBoard.css';
 import getValidMoves from './getValidMoves';
+
 import { useSocket } from '@/hook/SocketHook';
 import { useSession } from '@/hook/AuthHook';
 
@@ -22,27 +23,39 @@ const GameBoard = ()=> {
     return piece ? { type: piece, position: {x: rowIndex, y: colIndex}, color: color} : null;
   })))
   const [currentPlayer, setCurrentPlayer] = useState('red');
-  const [isYourTurn, setIsYourTurn] = useState(false);
+  //const [isYourTurn, setIsYourTurn] = useState(false);
   const [isCheck,setIsCheck] = useState(false);
   const [beingCheck, setBeingCheck]= useState(false);
   let isSelected = false;
   let selectedPiece = null;
   let validMoves = [];
-  //Socket
-  const playerSocket = useSocket(state => state.user)
-  // Send the board
-  const handleClickSocket =()=>{
-    if(isYourTurn){
-      handleClick;
-      const data = {
-        gameboard: board,
-        isCheck : isCheck,
-        isYourTurn: isYourTurn,
-        
-      };
+  const matchData = useSocket((state)=>state.matchData)
+  const socket = useSocket((state)=> state.socket)
+  const user = useSession((state)=> state.user)
+
+  const socketIDOponent=()=>{
+    console.log(matchData)
+    if(matchData.user1.userID== user.id){
+      return matchData.user2.socketID
     }
-        
+    return matchData.user1.socketID
   }
+
+  
+
+  useEffect(()=>{
+    if(socket==null) return
+    console.log("Board change")
+    
+    socket.on("getTurn", (newBoard)=>{
+      console.log("Socket:",newBoard)
+      setBoard(newBoard)
+    })
+
+    return()=>{
+      socket.off("getTurn")
+    }
+  },[])
 
   const movePiece = (currentPosition, newPosition) => {
     board[newPosition.x][newPosition.y] = null;
@@ -57,7 +70,7 @@ const GameBoard = ()=> {
 
   function isBeingCheck (currentPlayer, board) {
     // Get the opponent's color
-    const opponentColor = currentPlayer === 'red' ? 'black' : 'red';
+    const opponentColor = currentPlayer === 'black' ? 'red' : 'black';
 
     // Loop through all the positions on the board
     for (let i = 0; i < board.length; i++) {
@@ -118,6 +131,7 @@ const GameBoard = ()=> {
           if (selectedPiece) {
             // Only try to move the piece if one is selected
             movePiece(selectedPiece.position, position);
+            
             setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
           }
         }
@@ -140,7 +154,7 @@ const GameBoard = ()=> {
         setIsCheck(false);
       }
     // Unselect the piece and remove the highlights
-    isSelected = false; isYourTurn = false;
+    isSelected = false; //isYourTurn = false;
     document.querySelectorAll('.valid-move').forEach(cell => {
       cell.classList.remove('valid-move');
     });
@@ -193,6 +207,15 @@ const GameBoard = ()=> {
         console.log(isValidMove)
         if(isValidMove){
           handleOnMove(position);
+          console.log("socket:", board)
+          const socketID = socketIDOponent()
+          console.log(socketID)
+          const data = {
+            board: board,
+            socketID: socketID
+          }
+          console.log(data.board)
+          socket.emit("completeTurn", data)
         }   
       }
      

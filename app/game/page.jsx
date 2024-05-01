@@ -4,11 +4,12 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import NewGame from "@/components/lobby/NewGame";
 import Leaderboard from "@/components/lobby/Leaderboard";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Chat from "@/components/game/Chat";
 import GameBoard from "./GameBoard";
 
 const Game = () => {
+	const router = useRouter();
 	const buttonsInformation = [
 		{
 			iconReg: "/assets/chat-reg.svg",
@@ -36,7 +37,7 @@ const Game = () => {
 	};
 
 	const handleLogout = () => {
-		const router = useRouter();
+		
 		localStorage.removeItem("accessToken");
 		localStorage.removeItem("refreshToken");
 		router.push("/login");
