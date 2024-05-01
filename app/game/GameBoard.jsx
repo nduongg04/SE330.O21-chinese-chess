@@ -22,7 +22,7 @@ const GameBoard = ()=> {
     const color = rowIndex < 5 ? 'red' : 'black';
     return piece ? { type: piece, position: {x: rowIndex, y: colIndex}, color: color} : null;
   })))
-  const [currentPlayer, setCurrentPlayer] = useState('red');
+  
   const [isYourTurn, setIsYourTurn] = useState(false);
   const [isCheck,setIsCheck] = useState(false);
   const [beingCheck, setBeingCheck]= useState(false);
@@ -36,13 +36,24 @@ const GameBoard = ()=> {
 
   const socketIDOponent=()=>{
     console.log(matchData)
-    if(matchData.user1.userID== user.id){
+    if(matchData.user1.user.id== user.id){
       return matchData.user2.socketID
     }
     return matchData.user1.socketID
   }
 
+  const myColor = ()=>{
+    if(matchData.user1.user.id== user.id){
+      return matchData.user1.color
+    }
+    return matchData.user2.color
+  }
+  const currentPlayer= myColor();
+  useEffect(()=>{
+    if(currentPlayer==='red') setIsYourTurn(true)
+  },[])
   const handleClickSocket=(event)=>{
+    
     if(isYourTurn === false){
       return
     }
@@ -54,11 +65,9 @@ const GameBoard = ()=> {
   useEffect(()=>{
     if(socket==null) return
     console.log("Board change")
-    
-    socket.on("getTurn", (newBoard, color)=>{
+    socket.on("getTurn", (newBoard)=>{
       console.log("Socket:",newBoard)
       setBoard(newBoard)
-      setCurrentPlayer(color)
       setIsYourTurn(true)
     })
 
@@ -145,7 +154,7 @@ const GameBoard = ()=> {
             // Only try to move the piece if one is selected
             movePiece(selectedPiece.position, position);
             
-            setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
+          //  setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
           }
         }
       // Unselect the piece and remove the highlights
