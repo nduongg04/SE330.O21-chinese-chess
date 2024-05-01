@@ -23,12 +23,13 @@ const GameBoard = ()=> {
     return piece ? { type: piece, position: {x: rowIndex, y: colIndex}, color: color} : null;
   })))
   const [currentPlayer, setCurrentPlayer] = useState('red');
-  //const [isYourTurn, setIsYourTurn] = useState(false);
+  const [isYourTurn, setIsYourTurn] = useState(false);
   const [isCheck,setIsCheck] = useState(false);
   const [beingCheck, setBeingCheck]= useState(false);
   let isSelected = false;
   let selectedPiece = null;
   let validMoves = [];
+  // Socket
   const matchData = useSocket((state)=>state.matchData)
   const socket = useSocket((state)=> state.socket)
   const user = useSession((state)=> state.user)
@@ -41,15 +42,24 @@ const GameBoard = ()=> {
     return matchData.user1.socketID
   }
 
-  
+  const handleClickSocket=(event)=>{
+    if(isYourTurn === false){
+      return
+    }
+    else {
+      handleClick(event)
+    }
+  }
 
   useEffect(()=>{
     if(socket==null) return
     console.log("Board change")
     
-    socket.on("getTurn", (newBoard)=>{
+    socket.on("getTurn", (newBoard, color)=>{
       console.log("Socket:",newBoard)
       setBoard(newBoard)
+      setCurrentPlayer(color)
+      setIsYourTurn(true)
     })
 
     return()=>{
@@ -57,6 +67,9 @@ const GameBoard = ()=> {
     }
   },[])
 
+  
+
+ // End Socket
   const movePiece = (currentPosition, newPosition) => {
     board[newPosition.x][newPosition.y] = null;
     board[newPosition.x][newPosition.y]=board[currentPosition.x][currentPosition.y];
@@ -154,7 +167,7 @@ const GameBoard = ()=> {
         setIsCheck(false);
       }
     // Unselect the piece and remove the highlights
-    isSelected = false; //isYourTurn = false;
+    isSelected = false; isYourTurn = false;
     document.querySelectorAll('.valid-move').forEach(cell => {
       cell.classList.remove('valid-move');
     });
@@ -255,7 +268,7 @@ const GameBoard = ()=> {
               <div
                 id={`cell-${i}-${j}`}
                 className={`cell ${isValidMove ? 'valid-move' : ''}`}
-                onClick={handleClick}
+                onClick={handleClickSocket}
               >
                 {piece ? (
                   <ChessPiece
