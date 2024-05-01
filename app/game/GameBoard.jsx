@@ -83,7 +83,7 @@ const GameBoard = ()=> {
 
   function isBeingCheck (currentPlayer, board) {
     // Get the opponent's color
-    const opponentColor = currentPlayer === 'black' ? 'red' : 'black';
+    const opponentColor = currentPlayer === 'red' ? 'black' : 'red';
 
     // Loop through all the positions on the board
     for (let i = 0; i < board.length; i++) {
@@ -167,7 +167,7 @@ const GameBoard = ()=> {
         setIsCheck(false);
       }
     // Unselect the piece and remove the highlights
-    isSelected = false; isYourTurn = false;
+    isSelected = false; setIsYourTurn(false);
     document.querySelectorAll('.valid-move').forEach(cell => {
       cell.classList.remove('valid-move');
     });
