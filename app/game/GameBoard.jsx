@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import ChessPiece from './ChessPiece';
 import './GameBoard.css';
 import getValidMoves from './getValidMoves';
+import { useSocket } from '@/hook/SocketHook';
+import { useSession } from '@/hook/AuthHook';
 
 const GameBoard = ()=> {
   const [board, setBoard]  = useState( [
@@ -20,22 +22,39 @@ const GameBoard = ()=> {
     return piece ? { type: piece, position: {x: rowIndex, y: colIndex}, color: color} : null;
   })))
   const [currentPlayer, setCurrentPlayer] = useState('red');
+  const [isYourTurn, setIsYourTurn] = useState(false);
   const [isCheck,setIsCheck] = useState(false);
   const [beingCheck, setBeingCheck]= useState(false);
   let isSelected = false;
   let selectedPiece = null;
   let validMoves = [];
+  //Socket
+  const playerSocket = useSocket(state => state.user)
+  // Send the board
+  const handleClickSocket =()=>{
+    if(isYourTurn){
+      handleClick;
+      const data = {
+        gameboard: board,
+        isCheck : isCheck,
+        isYourTurn: isYourTurn,
+        
+      };
+    }
+        
+  }
 
   const movePiece = (currentPosition, newPosition) => {
     board[newPosition.x][newPosition.y] = null;
     board[newPosition.x][newPosition.y]=board[currentPosition.x][currentPosition.y];
     board[currentPosition.x][currentPosition.y] = null;
     board[newPosition.x][newPosition.y].position = {x: newPosition.x, y: newPosition.y};
-    console.log(board)
+    console.log(board);
     document.querySelectorAll('.valid-move').forEach(cell => {
       cell.classList.remove('valid-move');
     });
   }
+
   function isBeingCheck (currentPlayer, board) {
     // Get the opponent's color
     const opponentColor = currentPlayer === 'red' ? 'black' : 'red';
@@ -72,23 +91,24 @@ const GameBoard = ()=> {
     return false;
   } 
 
-//   function filterCheckMoves(currentPlayer, validMoves, piece) {
-//     // Copy the current board to a new variable to simulate the moves
-//     let simulatedBoard = board.map(row => row.map(piece => {
-//       return piece ? { ...piece, position: { ...piece.position } } : null;
-//     }));
-//     console.log(simulatedBoard)
-//     return validMoves.filter(move => {
-//         // Simulate the move
-//         simulatedBoard[move[0]][move[1]] = piece;
-//         simulatedBoard[piece.position[0]][piece.position[1]] = null;
-//         // Check if the move would put the player in check
-//         const wouldBeCheck = isBeingCheck(currentPlayer, simulatedBoard);
 
-//         // If the move would not put the player in check, it's a valid move
-//         return wouldBeCheck;
-//     });
-// }
+  function filterCheckMoves(currentPlayer, validMoves, piece) {
+    // Copy the current board to a new variable to simulate the moves
+    let simulatedBoard = board.map(row => row.map(piece => {
+      return piece ? { ...piece, position: { ...piece.position } } : null;
+    }));
+    console.log(simulatedBoard)
+    return validMoves.filter(move => {
+        // Simulate the move
+        simulatedBoard[move[0]][move[1]] = piece;
+        simulatedBoard[piece.position[0]][piece.position[1]] = null;
+        // Check if the move would put the player in check
+        const wouldBeCheck = isBeingCheck(currentPlayer, simulatedBoard);
+
+        // If the move would not put the player in check, it's a valid move
+        return wouldBeCheck;
+    });
+}
   
 
   const handleOnMove = ( position) =>{
@@ -120,7 +140,7 @@ const GameBoard = ()=> {
         setIsCheck(false);
       }
     // Unselect the piece and remove the highlights
-    isSelected = false; 
+    isSelected = false; isYourTurn = false;
     document.querySelectorAll('.valid-move').forEach(cell => {
       cell.classList.remove('valid-move');
     });
