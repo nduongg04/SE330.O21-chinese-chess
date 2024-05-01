@@ -21,9 +21,6 @@ const Lobby = () => {
 	useEffect(()=>{
 		const newSocket = io("https://chinesechess-socket.onrender.com")
 		setSocket(newSocket)
-		return ()=>{
-			newSocket.disconnect()
-		}
 	}, [])
 	useEffect(()=>{
 		if(socket==null)return

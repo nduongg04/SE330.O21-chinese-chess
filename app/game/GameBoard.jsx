@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import ChessPiece from './ChessPiece';
 import './GameBoard.css';
 import getValidMoves from './getValidMoves';
+import { useSocket } from '@/hook/SocketHook';
+import { useSession } from '@/hook/AuthHook';
 
 const GameBoard = ()=> {
   const [board, setBoard]  = useState( [
@@ -25,6 +27,33 @@ const GameBoard = ()=> {
   let isSelected = false;
   let selectedPiece = null;
   let validMoves = [];
+  const matchData = useSocket((state)=>state.matchData)
+  const socket = useSocket((state)=> state.socket)
+  const user = useSession((state)=> state.user)
+
+  const socketIDOponent=()=>{
+    console.log(matchData)
+    if(matchData.user1.userID== user.id){
+      return matchData.user2.socketID
+    }
+    return matchData.user1.socketID
+  }
+
+  
+
+  useEffect(()=>{
+    if(socket==null) return
+    console.log("Board change")
+    
+    socket.on("getTurn", (newBoard)=>{
+      console.log("Socket:",newBoard)
+      setBoard(newBoard)
+    })
+
+    return()=>{
+      socket.off("getTurn")
+    }
+  },[])
 
   const movePiece = (currentPosition, newPosition) => {
     board[newPosition.x][newPosition.y] = null;
@@ -98,6 +127,7 @@ const GameBoard = ()=> {
           if (selectedPiece) {
             // Only try to move the piece if one is selected
             movePiece(selectedPiece.position, position);
+            
             setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
           }
         }
@@ -173,6 +203,15 @@ const GameBoard = ()=> {
         console.log(isValidMove)
         if(isValidMove){
           handleOnMove(position);
+          console.log("socket:", board)
+          const socketID = socketIDOponent()
+          console.log(socketID)
+          const data = {
+            board: board,
+            socketID: socketID
+          }
+          console.log(data.board)
+          socket.emit("completeTurn", data)
         }   
       }
      
