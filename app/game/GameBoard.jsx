@@ -26,7 +26,7 @@ const GameBoard = ()=> {
   })))
   
   const [isYourTurn, setIsYourTurn] = useState(false);
- // const [isCheckMate, setIsCheckMate]= useState(false);
+  const [isWinner, setWinner]= useState(false);
   let isSelected = false;
   let selectedPiece = null;
   let validMoves = [];
@@ -194,7 +194,7 @@ const GameBoard = ()=> {
       validMoves = [];
       const checkmate = isCheckMate(currentPlayer, board);
       if(checkmate){
-        console.log('win');
+        setWinner(true);
         Swal.fire({
           title: "You win the match!",
           width: 600,

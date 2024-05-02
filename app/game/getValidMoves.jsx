@@ -12,8 +12,8 @@
     }
     // Quân xe
   if (type === 'chariot') {
-      // Kiểm tra các ô trên cùng một hàng
-      for (let i = position.x + 1; i < (10-position.x); i++) {
+      // Kiểm tra các ô trên cùng một cột
+      for (let i = position.x + 1; i < board.length; i++) {
         if (board[i][position.y] !== null) {
           if (board[i][position.y].color !== color) {
             validMoves.push({x: i, y: position.y});
@@ -32,7 +32,7 @@
         validMoves.push({x: i, y: position.y});
       }
   
-      // Kiểm tra các ô trên cùng một cột
+      // Kiểm tra các ô trên cùng một hàng
       for (let j = position.y + 1; j < board[0].length; j++) {
         if (board[position.x][j] !== null) {
           if (board[position.x][j].color !== color) {
