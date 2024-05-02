@@ -5,6 +5,7 @@ import getValidMoves from './getValidMoves';
 import Swal from 'sweetalert2'
 import { useSocket } from '@/hook/SocketHook';
 import { useSession } from '@/hook/AuthHook';
+import { useRouter } from "next/navigation";
 import axios from 'axios';
 
 const GameBoard = ()=> {
@@ -33,6 +34,8 @@ const GameBoard = ()=> {
   const matchData = useSocket((state)=>state.matchData)
   const socket = useSocket((state)=> state.socket)
   const user = useSession((state)=> state.user)
+  const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
+	//
 
   const socketIDOponent=()=>{
     console.log(matchData)
@@ -120,7 +123,7 @@ const GameBoard = ()=> {
             console.log("currentPiece", piece);
             // If one of the valid moves for the current player's piece is this position, return true
             if (piecevalidMoves.some(move => move.x === opponentGeneralPositon.x && move.y === opponentGeneralPositon.y)) {
-              console.log(true)
+              console.log("Check:",piece)
               return true;
           } 
         }
@@ -152,18 +155,16 @@ const GameBoard = ()=> {
   }
 
 
-  function filterCheckMoves(currentPlayer, validMoves, piece) {
+  function filterCheckMoves(currentPlayer, validMoves, pieceInSelect) {
     // Copy the current board to a new variable to simulate the moves
-    let simulatedBoard = board.map(row => row.map(piece => {
-      return piece ? { ...piece, position: { ...piece.position } } : null;
-    }));
-    console.log("simu",simulatedBoard)
     const opponentColor = currentPlayer === 'red' ? 'black' : 'red';
     console.log('OPC',opponentColor)
+    const piece = { ...pieceInSelect };
     return validMoves.filter(move => {
         // Simulate the move
-        console.log("piece", piece);
-        console.log(simulatedBoard[move.x][move.y]);
+        let simulatedBoard = board.map(row => row.map(piece => {
+          return piece ? { ...piece, position: { ...piece.position } } : null;
+        }));
         simulatedBoard[move.x][move.y] = piece;
         simulatedBoard[piece.position.x][piece.position.y] = null;
         console.log(simulatedBoard)
@@ -179,7 +180,7 @@ const GameBoard = ()=> {
       // Move the piece and switch the current player
       // If none of the above conditions are true, move the piece to the new position
       // Only try to move the piece if one is selected
-      movePiece(selectedPiece.position, position);   
+      movePiece(selectedPiece.position, position); 
       //  setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
       // Unselect the piece and remove the highlights
       console.log("board: ", board)
@@ -190,6 +191,7 @@ const GameBoard = ()=> {
           cell.classList.remove('valid-move');
         }
       });
+      validMoves = [];
       const checkmate = isCheckMate(currentPlayer, board);
       if(checkmate){
         console.log('win');
@@ -207,7 +209,30 @@ const GameBoard = ()=> {
           `
         }).then((result)=>{
           if(result.isConfirmed){
-            console.log("the win")
+            console.log("the win");
+            const createHistory = async () => {
+              let user2ID = matchData.user1.user.id;
+              if(matchData.user1.user.id== user.id){
+                user2ID = matchData.user2.user.id;
+              }
+              try {
+                const response = await axios({
+                  method: 'post',
+                  url: `${baseUrl}/api/v1/history/create?winScore=10&loseScore=1`,
+                  headers: {},
+                  data: {
+                    user1Id: user.id,
+                    user2Id: user2ID,
+                    user1Score: 1,
+                    user2Score: 0
+                  }
+                });
+            
+                console.log(response.data);
+              } catch (error) {
+                console.log("Error", error);
+              }
+            };
           }
         })
       } else {
@@ -215,6 +240,10 @@ const GameBoard = ()=> {
         if(check){
           console.log("check");
         }
+      }
+      if(checkmate){
+        const router = useRouter();
+        router.push("/lobby");
       }
     // Unselect the piece and remove the highlights
     isSelected = false; setIsYourTurn(false);
@@ -239,9 +268,11 @@ const GameBoard = ()=> {
           cell.classList.remove('valid-move');
         }
       });
+      validMoves = [];
       //Highlight the valid moves
       validMoves = getValidMoves(selectedPiece, board); 
       validMoves= filterCheckMoves(currentPlayer,validMoves,selectedPiece);
+      console.log("filter here:", validMoves)
       if(validMoves.length === 0){
         isSelected = false;
         selectedPiece = null;

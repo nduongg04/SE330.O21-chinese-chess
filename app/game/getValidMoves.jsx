@@ -175,36 +175,31 @@
       // Kiểm tra các ô mà quân tướng có thể di chuyển đến
       const deltas = [[-1, 0], [1, 0], [0, -1], [0, 1]];
       for (let delta of deltas) {
-          const newRow = position.x + delta[0];
-          const newCol = position.y + delta[1];
-          // Kiểm tra xem quân tướng có đang cố gắng di chuyển ra khỏi cung điện không
-          if ((color === 'red' && newRow >= 0 && newRow <= 2 && newCol >= 3 && newCol <= 5) || (color === 'black' && newRow >= 7 && newRow <= 9 && newCol >= 3 && newCol <= 5)) {
-              if (board[newRow][newCol] === null || board[newRow][newCol].color !== color) {
-                  validMoves.push({x: newRow, y: newCol});
-                  // Kiểm tra trống tướng 
-                  for (let i = 0; i < board.length; i++) {
-                    if (board[i][newCol] && board[i][newCol].type === 'general' && board[i][newCol].color !== color) {
-                        // There is another general in the same column, check if there are any pieces in between
-                        const start = Math.min(newRow.x, i);
-                        const end = Math.max(newRow.x, i);
-                        let isEmpty = true;
-                        for (let j = start + 1; j < end; j++) {
-                            if (board[j][newCol]) {
-                                isEmpty = false;
-                                break;
-                            }
-                        }
-                        // Không có quân ở giữa, trống tướng
-                        if (isEmpty) {
-                            validMoves.pop();
-                        }
-                        break;
-                    }
-                  }
-              }
+        const newRow = position.x + delta[0];
+        const newCol = position.y + delta[1];
+        // Kiểm tra xem quân tướng có đang cố gắng di chuyển ra khỏi cung điện không
+        if ((color === 'red' && newRow >= 0 && newRow <= 2 && newCol >= 3 && newCol <= 5) || (color === 'black' && newRow >= 7 && newRow <= 9 && newCol >= 3 && newCol <= 5)) {
+          if (board[newRow][newCol] === null || board[newRow][newCol].color !== color) {
+            validMoves.push({x: newRow, y: newCol});   
           }
+        }
       }
-        
+    
+      // Kiểm tra xem có quân tướng nào đối đầu không
+      for (let i = 0; i < 10; i++) {
+        if (board[i][position.y] && board[i][position.y].type === 'general' && board[i][position.y].color !== color) {
+          let clearPath = true;
+          for (let j = Math.min(i, position.x) + 1; j < Math.max(i, position.x); j++) {
+            if (board[j][position.y]) {
+              clearPath = false;
+              break;
+            }
+          }
+          if (clearPath) {
+            validMoves.push({x: i, y: position.y});
+          }
+        }
+      }
     }
     return validMoves;
   };
