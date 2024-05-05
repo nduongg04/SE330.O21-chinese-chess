@@ -29,7 +29,8 @@ const NewGame = () => {
 			if(socket==null) return
 			const data= {
 				min: times[selectedTime].time,
-				userID: user.id
+				user: user,
+				color: color
 			}
 			socket.emit("findMatch", data)
 			setTextPlayButton("Cancel")

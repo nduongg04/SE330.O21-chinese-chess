@@ -14,22 +14,21 @@ const Lobby = () => {
 	const user = useSession((state)=> state.user)
 	const socket = useSocket((state)=> state.socket)
 	const setSocket = useSocket((state)=> state.setSocket)
-	const onlineUsers = useSocket((state)=> state.onlineUsers)
 	const setOnlineUsers = useSocket((state)=> state.setOnlineUsers)
+	const setMatchData = useSocket((state)=> state.setMatchData)
 	const [isMatch, setIsMatch] = useState(false)
 	const router = useRouter();
 	useEffect(()=>{
 		const newSocket = io("https://chinesechess-socket.onrender.com")
 		setSocket(newSocket)
-		return ()=>{
-			newSocket.disconnect()
-		}
 	}, [])
 	useEffect(()=>{
 		if(socket==null)return
 		console.log("I have passed here")
 		socket.on("getMatchData", (data)=>{
 			setIsMatch(true)
+			setMatchData(data)
+			
 		})
 
 		return ()=>{

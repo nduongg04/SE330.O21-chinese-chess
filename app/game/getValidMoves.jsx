@@ -12,8 +12,8 @@
     }
     // Quân xe
   if (type === 'chariot') {
-      // Kiểm tra các ô trên cùng một hàng
-      for (let i = position.x + 1; i < (10-position.x); i++) {
+      // Kiểm tra các ô trên cùng một cột
+      for (let i = position.x + 1; i < board.length; i++) {
         if (board[i][position.y] !== null) {
           if (board[i][position.y].color !== color) {
             validMoves.push({x: i, y: position.y});
@@ -32,7 +32,7 @@
         validMoves.push({x: i, y: position.y});
       }
   
-      // Kiểm tra các ô trên cùng một cột
+      // Kiểm tra các ô trên cùng một hàng
       for (let j = position.y + 1; j < board[0].length; j++) {
         if (board[position.x][j] !== null) {
           if (board[position.x][j].color !== color) {
@@ -175,16 +175,32 @@
       // Kiểm tra các ô mà quân tướng có thể di chuyển đến
       const deltas = [[-1, 0], [1, 0], [0, -1], [0, 1]];
       for (let delta of deltas) {
-          const newRow = position.x + delta[0];
-          const newCol = position.y + delta[1];
-          // Kiểm tra xem quân tướng có đang cố gắng di chuyển ra khỏi cung điện không
-          if ((color === 'red' && newRow >= 0 && newRow <= 2 && newCol >= 3 && newCol <= 5) || (color === 'black' && newRow >= 7 && newRow <= 9 && newCol >= 3 && newCol <= 5)) {
-              if (board[newRow][newCol] === null || board[newRow][newCol].color !== color) {
-                  validMoves.push({x: newRow, y: newCol});
-              }
+        const newRow = position.x + delta[0];
+        const newCol = position.y + delta[1];
+        // Kiểm tra xem quân tướng có đang cố gắng di chuyển ra khỏi cung điện không
+        if ((color === 'red' && newRow >= 0 && newRow <= 2 && newCol >= 3 && newCol <= 5) || (color === 'black' && newRow >= 7 && newRow <= 9 && newCol >= 3 && newCol <= 5)) {
+          if (board[newRow][newCol] === null || board[newRow][newCol].color !== color) {
+            validMoves.push({x: newRow, y: newCol});   
           }
+        }
       }
-  }
+    
+      // Kiểm tra xem có quân tướng nào đối đầu không
+      for (let i = 0; i < 10; i++) {
+        if (board[i][position.y] && board[i][position.y].type === 'general' && board[i][position.y].color !== color) {
+          let clearPath = true;
+          for (let j = Math.min(i, position.x) + 1; j < Math.max(i, position.x); j++) {
+            if (board[j][position.y]) {
+              clearPath = false;
+              break;
+            }
+          }
+          if (clearPath) {
+            validMoves.push({x: i, y: position.y});
+          }
+        }
+      }
+    }
     return validMoves;
   };
 
