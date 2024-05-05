@@ -27,6 +27,7 @@ const GameBoard = ()=> {
   
   const [isYourTurn, setIsYourTurn] = useState(false);
   const [isWinner, setWinner]= useState(false);
+  const [isLoser, setLoser] = useState(false);
   let isSelected = false;
   let selectedPiece = null;
   let validMoves = [];
@@ -64,6 +65,29 @@ const GameBoard = ()=> {
       return
     }
     else {
+      // Get the opponent's color
+      const opponentColor = currentPlayer === 'red' ? 'black' : 'red';
+      const beingcheckmate = isCheckMate(opponentColor,board);
+      if(beingcheckmate){
+        setLoser(true);
+        Swal.fire({
+          title: "You lose the match!",
+          width: 600,
+          padding: "3em",
+          color: "#716add",
+          background: "#fff url(https://sweetalert2.github.io/images/trees.png)",
+          backdrop: `
+            rgba(0,0,123,0.4)
+            url("https://sweetalert2.github.io/images/nyan-cat.gif")
+            left top
+            no-repeat
+          `
+        }).then((result)=>{
+          if(result.isConfirmed){
+            console.log("the loser");
+          }
+        })
+      }
       handleClick(event)
     }
   }
@@ -209,7 +233,7 @@ const GameBoard = ()=> {
           `
         }).then((result)=>{
           if(result.isConfirmed){
-            console.log("the win");
+            console.log("the winner");
             const createHistory = async () => {
               let user2ID = matchData.user1.user.id;
               if(matchData.user1.user.id== user.id){
