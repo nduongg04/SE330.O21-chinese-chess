@@ -1,7 +1,10 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Leaderboard = () => {
+    const router = useRouter();
+
 	const [leaderboards, setLeaderboards] = useState([]);
 	useEffect(() => {
 		const getLeaderboard = async () => {

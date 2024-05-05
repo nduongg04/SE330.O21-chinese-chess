@@ -45,7 +45,7 @@ const Lobby = () => {
 	}, [isMatch])
 	useEffect(()=>{
 		if(socket == null) return
-		socket.emit("addOnlineUser", user.id)
+		socket.emit("addOnlineUser", user?.id)
 		socket.on ("getOnlineUsers", (users)=>{
 			setOnlineUsers(users)
 		})
