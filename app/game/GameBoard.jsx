@@ -55,9 +55,6 @@ const GameBoard = ()=> {
   }
   const currentPlayer= myColor();
   
-  useEffect(()=>{
-    if(currentPlayer ==='red' ) setIsYourTurn(true)
-  })
 
   const handleClickSocket=(event)=>{
     console.log(isYourTurn)
@@ -87,6 +84,7 @@ const GameBoard = ()=> {
             console.log("the loser");
           }
         })
+        return
       }
       handleClick(event)
     }
@@ -95,12 +93,11 @@ const GameBoard = ()=> {
   useEffect(()=>{
     if(socket===null) return
     console.log("Board change")
+    if(currentPlayer ==='red' ) setIsYourTurn(true)
     socket.on("getTurn", (newBoard)=>{
       console.log("Socket:",newBoard)
       setBoard(newBoard)
-      setIsYourTurn(true)
     })
-
     return()=>{
       socket.off("getTurn")
     }
@@ -270,7 +267,7 @@ const GameBoard = ()=> {
         router.push("/lobby");
       }
     // Unselect the piece and remove the highlights
-    isSelected = false; setIsYourTurn(false);
+    isSelected = false; 
   }
   
   const handleClick = (event) => {
@@ -280,8 +277,6 @@ const GameBoard = ()=> {
     let x = parseInt(parts[1]);
     let y = parseInt(parts[2]);
     console.log(`Coordinates are (${x}, ${y})`);
-    console.log(board)
-    console.log(board[x][y])
     if(isSelected && selectedPiece){
       if((board[x][y] && (board[x][y].position != selectedPiece.position && board[x][y].color === currentPlayer ))){
         selectedPiece = board[x][y];
@@ -323,16 +318,19 @@ const GameBoard = ()=> {
         if(isValidMove){
           handleOnMove(position);
           if(socket !== null){
-            console.log("socket:", board)
+          console.log("socket:", board)
           const socketID = socketIDOponent()
           console.log(socketID)
+          console.log(isYourTurn)
           const data = {
             board: board,
-            socketID: socketID
+            socketID: socketID,
+            isYourTurn: isYourTurn,
           }
           console.log(data.board)
           socket.emit("completeTurn", data)
           }
+          setIsYourTurn(false)
         }   
       }
      
