@@ -94,8 +94,6 @@ const GameBoard = () => {
 	const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
 	//
 
-    if (matchData === null) router.replace("/lobby");
-
 	const socketIDOponent = () => {
 		console.log(matchData);
 		if (matchData === null) return;
@@ -104,6 +102,26 @@ const GameBoard = () => {
 		}
 		return matchData.user1.socketID;
 	};
+	
+    if (matchData === null) {
+		router.replace("/lobby")
+	}
+
+	useEffect(()=>{
+		if(socket==null) return;
+		const handleBeforeUnload = ()=>{
+			const socketID = socketIDOponent()
+			socket.emit("surrender", {
+				socketID: socketID
+			})
+		}
+		window.addEventListener('beforeunload', handleBeforeUnload)
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		  };
+
+	},[socket])
+	
 
 	const myColor = () => {
 		if (matchData?.user1?.user?.id == user?.id) {

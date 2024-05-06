@@ -16,8 +16,20 @@ const Lobby = () => {
 	const setSocket = useSocket((state) => state.setSocket);
 	const setOnlineUsers = useSocket((state) => state.setOnlineUsers);
 	const setMatchData = useSocket((state) => state.setMatchData);
+	const matchData = useSocket((state)=> state.matchData)
 	const [isMatch, setIsMatch] = useState(false);
 	const router = useRouter();
+
+	const socketIDOponent = () => {
+		console.log(matchData);
+		if (matchData === null) return;
+		if (matchData.user1.user.id == user.id) {
+			return matchData.user2.socketID;
+		}
+		return matchData.user1.socketID;
+	};
+
+
 	useEffect(() => {
 		if (user == null) router.replace("/login");
 		const newSocket = io("https://chinesechess-socket.onrender.com");
