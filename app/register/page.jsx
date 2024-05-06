@@ -4,12 +4,12 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {useSession} from "@/hook/AuthHook"
+import { useSession } from "@/hook/AuthHook";
 
 const Register = () => {
 	const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
 	const router = useRouter();
-	const setUser = useSession((state)=> state.setUser)
+	const setUser = useSession((state) => state.setUser);
 	const [formData, setFormData] = useState({
 		email: "",
 		username: "",
@@ -19,13 +19,13 @@ const Register = () => {
 	const [errorMessage, setErrorMessage] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
 	const [confirmMessage, setConfirmMessage] = useState("");
-    const [passwordMessage, setPasswordMessage] = useState("");
+	const [passwordMessage, setPasswordMessage] = useState("");
 
 	useEffect(() => {
 		const removeToken = () => {
 			localStorage.removeItem("accessToken");
 			localStorage.removeItem("refreshToken");
-			localStorage.removeItem("user")
+			localStorage.removeItem("user");
 		};
 		removeToken();
 	}, []);
@@ -49,12 +49,18 @@ const Register = () => {
 					},
 					body: JSON.stringify(registerData),
 				});
-				const data = await response.json();
-				localStorage.setItem("accessToken", data.access_token);
-				localStorage.setItem("refreshToken", data.refresh_token);
-				localStorage.setItem("user", JSON.stringify(data.data))
-				setUser(data.data)
-				router.push("/lobby");
+				console.log(response);
+				if (response.ok) {
+					const data = await response.json();
+					localStorage.setItem("accessToken", data.access_token);
+					localStorage.setItem("refreshToken", data.refresh_token);
+					localStorage.setItem("user", JSON.stringify(data.data));
+					setUser(data.data);
+					router.push("/lobby");
+				}
+                else if(response.status === 409){
+                    setErrorMessage("Email already exists");
+                }
 			} catch (error) {
 				setErrorMessage("Something went wrong. Please try again later.");
 				console.log(error);
@@ -65,9 +71,9 @@ const Register = () => {
 	};
 
 	const handleChange = (event) => {
-        if(event.target.name === "password" && event.target.value.length < 15){
-            setPasswordMessage("Password must be at least 15 characters long");
-        }
+		if (event.target.name === "password" && event.target.value.length < 15) {
+			setPasswordMessage("Password must be at least 15 characters long");
+		}
 		setFormData({
 			...formData,
 			[event.target.name]: event.target.value,

@@ -46,9 +46,11 @@ const Login = () => {
 				body: JSON.stringify(formData),
 			});
 
-			if (response.status === 409) {
-				setErrorMessage("Email is used already. Please try another one.");
-				return;
+            console.log(response)
+
+			if (response.status === 401) {
+				setErrorMessage("Invalid email or password. Please try again.");
+                return;
 			} else if (response.status !== 200) {
 				setErrorMessage("Something went wrong. Please try again later.");
 				return;

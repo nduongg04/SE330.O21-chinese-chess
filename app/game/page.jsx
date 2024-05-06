@@ -4,21 +4,17 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import NewGame from "@/components/lobby/NewGame";
 import Leaderboard from "@/components/lobby/Leaderboard";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import Chat from "@/components/game/Chat";
 import GameBoard from "./GameBoard";
 
 const Game = () => {
+	const router = useRouter();
 	const buttonsInformation = [
 		{
 			iconReg: "/assets/chat-reg.svg",
 			iconPressed: "/assets/chat.svg",
 			text: "Chat",
-		},
-		{
-			iconReg: "/assets/plus-fill-reg.svg",
-			iconPressed: "/assets/plus-fill.svg",
-			text: "New game",
 		},
 		{
 			iconReg: "/assets/leaderboard-reg.svg",
@@ -31,24 +27,21 @@ const Game = () => {
 
 	const componentsMap = {
 		Chat: <Chat />,
-		"New game": <NewGame />,
 		Leaderboard: <Leaderboard />,
 	};
 
-	const handleLogout = () => {
-		const router = useRouter();
-		localStorage.removeItem("accessToken");
-		localStorage.removeItem("refreshToken");
-		router.push("/login");
+    // handle surrender
+	const handleSurrender = () => {	
+		
 	};
 
 	return (
 		<div className="flex gap-7 justify-center items-center">
 			<button
-				onClick={handleLogout}
+				onClick={handleSurrender}
 				className="bg-red-500 rounded-lg absolute bottom-3 right-3 hover:shadow-xl shadow-indigo-400"
 			>
-				<Image src="/assets/logout.svg" width={45} height={45} />
+				<Image alt="surrender" src="/assets/surrender.png" width={45} height={45} />
 			</button>
 			<div className="xl:block hidden w-[854px]">
 				<GameBoard/>

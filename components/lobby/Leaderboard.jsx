@@ -1,7 +1,10 @@
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Leaderboard = () => {
+    const router = useRouter();
+
 	const [leaderboards, setLeaderboards] = useState([]);
 	useEffect(() => {
 		const getLeaderboard = async () => {
@@ -21,10 +24,7 @@ const Leaderboard = () => {
 						return null;
 					}
 
-					console.log(response);
-
 					const data = await response.json();
-					console.log(data);
 					return data;
 				} catch (error) {
 					console.error(error);
@@ -98,7 +98,7 @@ const Leaderboard = () => {
 						const rank = playerIdx + 1;
 						return (
 							<tr key={playerIdx} className="hover:bg-blue-500 group">
-								<td className="group-hover:text-white px-6 py-4 whitespace-nowrap">
+								<td className="group-hover:text-white px-6 py-4 whitespace-nowrap flex justify-center">
 									{rank <= 3 ? (
 										<Image
 											width={25}
