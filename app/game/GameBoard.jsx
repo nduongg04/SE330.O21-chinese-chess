@@ -116,7 +116,15 @@ const GameBoard = () => {
 	useEffect(() => {
         
 		if (currentPlayer === "red") setIsYourTurn(true);
-	});
+	},[]);
+
+	useEffect(()=>{
+		if(socket ==null) return;
+		socket.on("winner",(res)=>{
+			console.log("winner")
+			setWinner(true)
+		})
+	},[])
 
 	const handleClickSocket = (event) => {
 		console.log(isYourTurn);
