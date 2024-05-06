@@ -17,11 +17,6 @@ const Game = () => {
 			text: "Chat",
 		},
 		{
-			iconReg: "/assets/plus-fill-reg.svg",
-			iconPressed: "/assets/plus-fill.svg",
-			text: "New game",
-		},
-		{
 			iconReg: "/assets/leaderboard-reg.svg",
 			iconPressed: "/assets/leaderboard.svg",
 			text: "Leaderboard",
@@ -32,24 +27,21 @@ const Game = () => {
 
 	const componentsMap = {
 		Chat: <Chat />,
-		"New game": <NewGame />,
 		Leaderboard: <Leaderboard />,
 	};
 
-	const handleLogout = () => {
+    // handle surrender
+	const handleSurrender = () => {	
 		
-		localStorage.removeItem("accessToken");
-		localStorage.removeItem("refreshToken");
-		router.push("/login");
 	};
 
 	return (
 		<div className="flex gap-7 justify-center items-center">
 			<button
-				onClick={handleLogout}
+				onClick={handleSurrender}
 				className="bg-red-500 rounded-lg absolute bottom-3 right-3 hover:shadow-xl shadow-indigo-400"
 			>
-				<Image src="/assets/logout.svg" width={45} height={45} />
+				<Image alt="surrender" src="/assets/surrender.png" width={45} height={45} />
 			</button>
 			<div className="xl:block hidden w-[854px]">
 				<GameBoard/>
