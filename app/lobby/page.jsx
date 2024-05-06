@@ -6,49 +6,60 @@ import NewGame from "@/components/lobby/NewGame";
 import History from "@/components/lobby/History";
 import Leaderboard from "@/components/lobby/Leaderboard";
 import { useRouter } from "next/navigation";
-import {useSocket} from "@/hook/SocketHook"
-import {useSession} from "@/hook/AuthHook"
+import { useSocket } from "@/hook/SocketHook";
+import { useSession } from "@/hook/AuthHook";
 import { io } from "socket.io-client";
 
 const Lobby = () => {
-	const user = useSession((state)=> state.user)
-	const socket = useSocket((state)=> state.socket)
-	const setSocket = useSocket((state)=> state.setSocket)
-	const setOnlineUsers = useSocket((state)=> state.setOnlineUsers)
-	const setMatchData = useSocket((state)=> state.setMatchData)
-	const [isMatch, setIsMatch] = useState(false)
+	const user = useSession((state) => state.user);
+	const socket = useSocket((state) => state.socket);
+	const setSocket = useSocket((state) => state.setSocket);
+	const setOnlineUsers = useSocket((state) => state.setOnlineUsers);
+	const setMatchData = useSocket((state) => state.setMatchData);
+	const matchData = useSocket((state)=> state.matchData)
+	const [isMatch, setIsMatch] = useState(false);
 	const router = useRouter();
-	useEffect(()=>{
-		const newSocket = io("https://chinesechess-socket.onrender.com")
-		setSocket(newSocket)
-	}, [])
-	useEffect(()=>{
-		if(socket==null)return
-		console.log("I have passed here")
-		socket.on("getMatchData", (data)=>{
-			setIsMatch(true)
-			setMatchData(data)
-			
-		})
 
-		return ()=>{
-			socket.off("getMatchData")
+	const socketIDOponent = () => {
+		console.log(matchData);
+		if (matchData === null) return;
+		if (matchData.user1.user.id == user.id) {
+			return matchData.user2.socketID;
 		}
-	}, [isMatch,socket])
+		return matchData.user1.socketID;
+	};
 
-	useEffect(()=>{
-		console.log(isMatch)
-		if(isMatch){
-			router.push("/game")
+
+	useEffect(() => {
+		if (user == null) router.replace("/login");
+		const newSocket = io("https://chinesechess-socket.onrender.com");
+		setSocket(newSocket);
+	}, []);
+	useEffect(() => {
+		if (socket == null) return;
+		socket.on("getMatchData", (data) => {
+			setIsMatch(true);
+			setMatchData(data);
+		});
+
+		return () => {
+			socket.off("getMatchData");
+		};
+	}, [isMatch, socket]);
+
+	useEffect(() => {
+		console.log(isMatch);
+		if (isMatch) {
+			router.push("/game");
 		}
-	}, [isMatch])
-	useEffect(()=>{
-		if(socket == null) return
-		socket.emit("addOnlineUser", user.id)
-		socket.on ("getOnlineUsers", (users)=>{
-			setOnlineUsers(users)
-		})
-	}, [socket])
+	}, [isMatch]);
+	useEffect(() => {
+		if (socket == null) return;
+		socket.emit("addOnlineUser", user?.id);
+		socket.on("getOnlineUsers", (users) => {
+			setOnlineUsers(users);
+		});
+	}, [socket]);
 	const buttonsInformation = [
 		{
 			iconReg: "/assets/plus-fill-reg.svg",
@@ -84,10 +95,11 @@ const Lobby = () => {
 	return (
 		<div className="flex gap-7 justify-center items-center">
 			<button
+				title="Log out"
 				onClick={handleLogout}
 				className="bg-red-500 rounded-lg absolute bottom-3 right-3 hover:shadow-xl shadow-indigo-400"
 			>
-				<Image src="/assets/logout.svg" width={45} height={45} />
+				<Image alt="logout" src="/assets/logout.svg" width={45} height={45} />
 			</button>
 			<div className="xl:block hidden w-[854px] bg-red-300">
 				Bàn cờ + player
