@@ -10,80 +10,26 @@ import axios from "axios";
 import { match } from "assert";
 
 const GameBoard = () => {
-
-    
-
 	const router = useRouter();
-
-	const [board, setBoard] = useState(
-		[
-			[
-				"chariot",
-				"horse",
-				"elephant",
-				"advisor",
-				"general",
-				"advisor",
-				"elephant",
-				"horse",
-				"chariot",
-			],
-			[null, null, null, null, null, null, null, null, null],
-			[null, "cannon", null, null, null, null, null, "cannon", null],
-			[
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-			],
-			Array(9).fill(null),
-			Array(9).fill(null),
-			[
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-			],
-			[null, "cannon", null, null, null, null, null, "cannon", null],
-			[null, null, null, null, null, null, null, null, null],
-			[
-				"chariot",
-				"horse",
-				"elephant",
-				"advisor",
-				"general",
-				"advisor",
-				"elephant",
-				"horse",
-				"chariot",
-			],
-		].map((row, rowIndex) =>
-			row.map((piece, colIndex) => {
-				const color = rowIndex < 5 ? "red" : "black";
-				return piece
-					? {
-							type: piece,
-							position: { x: rowIndex, y: colIndex },
-							color: color,
-					  }
-					: null;
-			})
-		)
-	);
+	const [board, setBoard]  = useState( [
+    ['chariot', 'horse', 'elephant', 'advisor', 'general', 'advisor', 'elephant', 'horse', 'chariot'],
+    [null, null, null, null, null, null, null, null, null],
+    [null, 'cannon', null, null, null, null, null, 'cannon', null],
+    ['soldier', null, 'soldier', null, 'soldier', null, 'soldier', null, 'soldier'],
+    Array(9).fill(null),
+    Array(9).fill(null),
+    ['soldier', null, 'soldier', null, 'soldier', null, 'soldier', null, 'soldier'],
+    [null, 'cannon', null, null, null, null, null, 'cannon', null],
+    [null, null, null, null, null, null, null, null, null],
+    ['chariot', 'horse', 'elephant', 'advisor', 'general', 'advisor', 'elephant', 'horse', 'chariot'],
+  ].map((row, rowIndex) => row.map((piece, colIndex) => {
+    const color = rowIndex < 5 ? 'red' : 'black';
+    return piece ? { type: piece, position: {x: rowIndex, y: colIndex}, color: color} : null;
+  })));
 
 	const [isYourTurn, setIsYourTurn] = useState(false);
-	const [isWinner, setWinner] = useState(false);
-	const [isLoser, setLoser] = useState(false);
+	let [isWinner, setWinner] = useState(false);
+	let [isLoser, setLoser] = useState(false);
 	let isSelected = false;
 	let selectedPiece = null;
 	let validMoves = [];
@@ -94,8 +40,6 @@ const GameBoard = () => {
 	const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
 	//
 
-    if (matchData === null) router.replace("/lobby");
-
 	const socketIDOponent = () => {
 		console.log(matchData);
 		if (matchData === null) return;
@@ -104,7 +48,27 @@ const GameBoard = () => {
 		}
 		return matchData.user1.socketID;
 	};
+	
+    if (matchData === null) {
+		console.log("comehere")
+		router.replace("/lobby")
+	}
 
+	useEffect(()=>{
+		if(socket==null) return;
+		const handleBeforeUnload = ()=>{
+			const socketID = socketIDOponent()
+			socket.emit("surrender", {
+				socketID: socketID
+			})
+		}
+		window.addEventListener('beforeunload', handleBeforeUnload)
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		  };
+
+	},[socket])
+	
 	const myColor = () => {
 		if (matchData?.user1?.user?.id == user?.id) {
 			return matchData?.user1?.color;
@@ -113,40 +77,123 @@ const GameBoard = () => {
 	};
 	const currentPlayer = myColor();
 
-	useEffect(() => {
-        
+	useEffect(() => {    
 		if (currentPlayer === "red") setIsYourTurn(true);
-	});
+	},[]);
 
-	const handleClickSocket = (event) => {
-		console.log(isYourTurn);
-		if (isYourTurn === false) {
-			return;
+	useEffect(()=>{
+		if(socket ==null) return;
+		socket.on("winner",(res)=>{
+			console.log("winner")
+			setWinner(true)
+		})
+	},[])
+
+	useEffect(() => {
+		// Get the opponent's color
+		const opponentColor = currentPlayer === "red" ? "black" : "red";
+		if(isCheckMate(opponentColor,board)){
+			isLoser = true;
+			comeForLose();
 		} else {
-			// Get the opponent's color
-			const opponentColor = currentPlayer === "red" ? "black" : "red";
-			const beingcheckmate = isCheckMate(opponentColor, board);
-			if (beingcheckmate) {
-				setLoser(true);
+			const check = isChecking(opponentColor, board);
+			if (check) {
+				console.log("check");
 				Swal.fire({
-					title: "You lose the match!",
-					width: 600,
-					padding: "3em",
-					color: "#716add",
-					background:
-						"#fff url(https://sweetalert2.github.io/images/trees.png)",
-					backdrop: `
+					position: "center",
+					icon: "warning",
+					title: "Check!",
+					showConfirmButton: false,
+					timer: 2000
+				});
+			}
+		}
+
+	  }, [board]);
+
+  const comeForWin = () =>{
+    if(isWinner){
+      Swal.fire({
+        title: "You win the match!",
+        width: 600,
+        padding: "3em",
+        color: "#716add",
+        background: "#fff url(https://github.com/DQP-UIT/SE330.O21-ChineseChess/blob/main/assets/images/blankMess.jpg?raw=true)",
+        backdrop: `
             rgba(0,0,123,0.4)
-            url("https://sweetalert2.github.io/images/nyan-cat.gif")
+            url("https://github.com/DQP-UIT/SE330.O21-ChineseChess/blob/main/assets/images/win.gif?raw=true")
             left top
             no-repeat
           `,
-				}).then((result) => {
-					if (result.isConfirmed) {
-						console.log("the loser");
-					}
-				});
-			}
+      }).then(() => {});
+      console.log("the winner");
+      const createHistory = async () => {
+        let user2ID = matchData.user1.user.id;
+        if (matchData.user1.user.id == user.id) {
+          user2ID = matchData.user2.user.id;
+        }
+        try {
+          const response = await axios({
+            method: "post",
+            url: `${baseUrl}/api/v1/history/create?winScore=10&loseScore=1`,
+            headers: {},
+            data: {
+              user1Id: user.id,
+              user2Id: user2ID,
+              user1Score: 1,
+              user2Score: 0,
+            },
+          });
+
+          console.log(response.data);
+        } catch (error) {
+          console.log("Error", error);
+        }
+      };
+	  router.replace("/lobby");
+      return true;
+    }
+    return false;
+  }
+
+  const comeForLose= ()=>{
+    if (isLoser) {
+      Swal.fire({
+        title: "You lose the match!",
+        width: 600,
+        padding: "3em",
+        color: "#716add",
+        background:
+          "#fff url(https://github.com/DQP-UIT/SE330.O21-ChineseChess/blob/main/assets/images/blankMess.jpg?raw=true)",
+        backdrop: `
+          rgba(0,0,123,0.4)
+          url("https://github.com/DQP-UIT/SE330.O21-ChineseChess/blob/main/assets/images/lost.gif?raw=true")
+          left top
+          no-repeat
+        `,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          console.log("the loser");
+        }
+      });
+	  router.replace("/lobby")
+      return true;
+    }
+    return false;
+  }
+
+  // Check for free win
+  useEffect(()=>{
+	if(isWinner){
+		comeForWin();
+	}
+  },[isWinner])
+
+	const handleClickSocket = (event) => {
+    // Take the turn
+		if (isYourTurn === false) {
+			return;
+		} else {
 			handleClick(event);
 		}
 	};
@@ -165,11 +212,12 @@ const GameBoard = () => {
 		};
 	}, []);
 
+
 	// End Socket
 	const movePiece = (currentPosition, newPosition) => {
 		board[newPosition.x][newPosition.y] = null;
 		board[newPosition.x][newPosition.y] =
-			board[currentPosition.x][currentPosition.y];
+		board[currentPosition.x][currentPosition.y];
 		board[currentPosition.x][currentPosition.y] = null;
 		board[newPosition.x][newPosition.y].position = {
 			x: newPosition.x,
@@ -209,7 +257,6 @@ const GameBoard = () => {
 				if (piece && piece.color === currentPlayer) {
 					// Get the valid moves for this piece
 					let piecevalidMoves = getValidMoves(piece, board);
-					console.log("currentPiece", piece);
 					// If one of the valid moves for the current player's piece is this position, return true
 					if (
 						piecevalidMoves.some(
@@ -263,7 +310,6 @@ const GameBoard = () => {
 			);
 			simulatedBoard[move.x][move.y] = piece;
 			simulatedBoard[piece.position.x][piece.position.y] = null;
-			console.log(simulatedBoard);
 			// Check if the move would put the player in check
 			const wouldBeCheck = isChecking(opponentColor, simulatedBoard);
 			// If the move would not put the player in check, it's a valid move
@@ -289,59 +335,36 @@ const GameBoard = () => {
 		validMoves = [];
 		const checkmate = isCheckMate(currentPlayer, board);
 		if (checkmate) {
-			setWinner(true);
-			Swal.fire({
-				title: "You win the match!",
-				width: 600,
-				padding: "3em",
-				color: "#716add",
-				background: "#fff url(https://sweetalert2.github.io/images/trees.png)",
-				backdrop: `
-            rgba(0,0,123,0.4)
-            url("https://sweetalert2.github.io/images/nyan-cat.gif")
-            left top
-            no-repeat
-          `,
-			}).then((result) => {
-				if (result.isConfirmed) {
-					console.log("the winner");
-					const createHistory = async () => {
-						let user2ID = matchData.user1.user.id;
-						if (matchData.user1.user.id == user.id) {
-							user2ID = matchData.user2.user.id;
-						}
-						try {
-							const response = await axios({
-								method: "post",
-								url: `${baseUrl}/api/v1/history/create?winScore=10&loseScore=1`,
-								headers: {},
-								data: {
-									user1Id: user.id,
-									user2Id: user2ID,
-									user1Score: 1,
-									user2Score: 0,
-								},
-							});
-
-							console.log(response.data);
-						} catch (error) {
-							console.log("Error", error);
-						}
-					};
-				}
-			});
+			isWinner = true
+			comeForWin();
 		} else {
 			const check = isChecking(currentPlayer, board);
 			if (check) {
 				console.log("check");
+				Swal.fire({
+					position: "center",
+					icon: "info",
+					title: "Check!",
+					showConfirmButton: false,
+					timer: 2000
+				});
 			}
 		}
-		if (checkmate) {
-			router.push("/lobby");
-		}
-		// Unselect the piece and remove the highlights
+    // Unselect the piece and remove the highlights
 		isSelected = false;
 		setIsYourTurn(false);
+    // Post
+		if (socket !== null) {
+		console.log("socket:", board);
+		const socketID = socketIDOponent();
+		console.log(socketID);
+		const data = {
+			board: board,
+			socketID: socketID,
+		};
+		console.log("SBoard:",data.board);
+		socket.emit("completeTurn", data);
+		}		
 	};
 
 	const handleClick = (event) => {
@@ -350,9 +373,6 @@ const GameBoard = () => {
 		let parts = id.split("-");
 		let x = parseInt(parts[1]);
 		let y = parseInt(parts[2]);
-		console.log(`Coordinates are (${x}, ${y})`);
-		console.log(board);
-		console.log(board[x][y]);
 		if (isSelected && selectedPiece) {
 			if (
 				board[x][y] &&
@@ -398,17 +418,6 @@ const GameBoard = () => {
 				console.log(isValidMove);
 				if (isValidMove) {
 					handleOnMove(position);
-					if (socket !== null) {
-						console.log("socket:", board);
-						const socketID = socketIDOponent();
-						console.log(socketID);
-						const data = {
-							board: board,
-							socketID: socketID,
-						};
-						console.log(data.board);
-						socket.emit("completeTurn", data);
-					}
 				}
 			}
 		} else if (
