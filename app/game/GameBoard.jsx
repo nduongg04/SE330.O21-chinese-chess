@@ -113,44 +113,43 @@ const GameBoard = () => {
 
   const comeForWin = () =>{
     if(isWinner){
-      Swal.fire({
-        title: "You win the match!",
-        width: 600,
-        padding: "3em",
-        color: "#716add",
-        background: "#fff url(https://github.com/DQP-UIT/SE330.O21-ChineseChess/blob/main/assets/images/blankMess.jpg?raw=true)",
-        backdrop: `
-            rgba(0,0,123,0.4)
-            url("https://github.com/DQP-UIT/SE330.O21-ChineseChess/blob/main/assets/images/win.gif?raw=true")
-            left top
-            no-repeat
-          `,
-      }).then(() => {});
-      console.log("the winner");
-      const createHistory = async () => {
-        let user2ID = matchData.user1.user.id;
-        if (matchData.user1.user.id == user.id) {
-          user2ID = matchData.user2.user.id;
-        }
-        try {
-          const response = await axios({
-            method: "post",
-            url: `${baseUrl}/api/v1/history/create?winScore=10&loseScore=1`,
-            headers: {},
-            data: {
-              user1Id: user.id,
-              user2Id: user2ID,
-              user1Score: 1,
-              user2Score: 0,
-            },
-          });
-
-          console.log(response.data);
-        } catch (error) {
-          console.log("Error", error);
-        }
-      };
-	  router.replace("/lobby");
+		Swal.fire({
+			title: "Victory",
+			text: "You won the match!",
+			imageUrl: "https://unsplash.it/400/200",
+			imageWidth: 400,
+			imageHeight: 200,
+			imageAlt: "Custom image"
+		}).then((res)=>{
+			if(res.isConfirmed){
+				console.log("the winner");
+      			const createHistory = async () => {
+				let user2ID = matchData.user1.user.id;
+				if (matchData.user1.user.id == user.id) {
+				user2ID = matchData.user2.user.id;
+				}
+				try {
+				const response = await axios({
+					method: "post",
+					url: `${baseUrl}/api/v1/history/create?winScore=10&loseScore=1`,
+					headers: {},
+					data: {
+					user1Id: user.id,
+					user2Id: user2ID,
+					user1Score: 1,
+					user2Score: 0,
+					},
+				});
+				response;
+				console.log(response.data);
+				} catch (error) {
+					console.log("Error", error);
+				}
+				};
+				router.replace("/lobby");
+			}
+		});
+      
       return true;
     }
     return false;
@@ -158,25 +157,19 @@ const GameBoard = () => {
 
   const comeForLose= ()=>{
     if (isLoser) {
-      Swal.fire({
-        title: "You lose the match!",
-        width: 600,
-        padding: "3em",
-        color: "#716add",
-        background:
-          "#fff url(https://github.com/DQP-UIT/SE330.O21-ChineseChess/blob/main/assets/images/blankMess.jpg?raw=true)",
-        backdrop: `
-          rgba(0,0,123,0.4)
-          url("https://github.com/DQP-UIT/SE330.O21-ChineseChess/blob/main/assets/images/lost.gif?raw=true")
-          left top
-          no-repeat
-        `,
-      }).then((result) => {
+		Swal.fire({
+			title: "Defeat",
+			text: "You lost the match!",
+			imageUrl: "https://unsplash.it/400/200",
+			imageWidth: 400,
+			imageHeight: 200,
+			imageAlt: "Custom image"
+		}).then((result) => {
         if (result.isConfirmed) {
           console.log("the loser");
+		  router.replace("/lobby");
         }
       });
-	  router.replace("/lobby")
       return true;
     }
     return false;
