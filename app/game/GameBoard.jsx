@@ -113,6 +113,29 @@ const GameBoard = () => {
 
   const comeForWin = () =>{
     if(isWinner){
+		const createHistory = async () => {
+			let user2ID = matchData.user1.user.id;
+			if (matchData.user1.user.id == user.id) {
+			user2ID = matchData.user2.user.id; 
+			}
+			try {
+			const response = await axios({
+				method: "post",
+				url: `${baseUrl}/api/v1/history/create?winScore=10&loseScore=1`,
+				headers: {},
+				data: {
+				user1Id: user.id,
+				user2Id: user2ID,
+				user1Score: 1,
+				user2Score: 0,
+				},
+			});
+			console.log(response);
+			} catch (error) {
+				console.log("Error", error);
+			}
+		};
+		createHistory();
 		Swal.fire({
 			title: "Victory",
 			text: "You won the match!",
@@ -124,29 +147,6 @@ const GameBoard = () => {
 		}).then((res)=>{
 			if(res.isConfirmed){
 				console.log("the winner");
-      			const createHistory = async () => {
-					let user2ID = matchData.user1.user.id;
-					if (matchData.user1.user.id == user.id) {
-					user2ID = matchData.user2.user.id; 
-					}
-					try {
-					const response = await axios({
-						method: "post",
-						url: `${baseUrl}/api/v1/history/create?winScore=10&loseScore=1`,
-						headers: {},
-						data: {
-						user1Id: user.id,
-						user2Id: user2ID,
-						user1Score: 1,
-						user2Score: 0,
-						},
-					});
-					console.log(response);
-					} catch (error) {
-						console.log("Error", error);
-					}
-				};
-				createHistory();
 				router.replace("/lobby");
 			}
 		});
