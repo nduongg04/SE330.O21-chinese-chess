@@ -10,7 +10,6 @@ import GameBoard from "./GameBoard";
 import { useSocket } from "@/hook/SocketHook";
 import { useSession } from "@/hook/AuthHook";
 import Swal from "sweetalert2";
-import Timer from "./Timer";
 
 const Game = () => {
 	const router = useRouter();
@@ -73,23 +72,14 @@ const Game = () => {
 
 	return (
 		<div className="flex gap-7 justify-center items-center">
-			<Username top={0} left={20} name={matchData && matchData.user1.user.name} /> 
-			<Username bot={0} right={20} name={matchData && matchData.user2.user.name} /> 
-			<div style={{ position: "absolute", top: "0", right: "20px" }}>
-				<Timer top={0} />
-			</div>
-			<div style={{ position: "absolute", bottom: "0", right: "20px" }}>
-				<Timer bot={0} />
-			</div>
 			<button
 				onClick={handleSurrender}
 				className="bg-red-500 rounded-lg absolute bottom-3 right-3 hover:shadow-xl shadow-indigo-400"
 			>
 				<Image alt="surrender" src="/assets/surrender.png" width={45} height={45} />
 			</button>
-			
 			<div className="xl:block hidden w-[854px]">
-				<GameBoard />
+				<GameBoard/>
 			</div>
 
 			<div className="flex items-center justify-center my-11">
