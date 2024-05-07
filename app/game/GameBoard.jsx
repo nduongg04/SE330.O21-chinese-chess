@@ -51,7 +51,6 @@ const GameBoard = () => {
 	};
 	
     if (matchData === null) {
-		console.log("comehere")
 		router.replace("/lobby")
 	}
 
@@ -102,7 +101,7 @@ const GameBoard = () => {
 				console.log("check");
 				Swal.fire({
 					position: "center",
-					icon: "warning",
+					icon: "info",
 					title: "Check!",
 					showConfirmButton: false,
 					timer: 2000
@@ -127,7 +126,7 @@ const GameBoard = () => {
       			const createHistory = async () => {
 					let user2ID = matchData.user1.user.id;
 					if (matchData.user1.user.id == user.id) {
-					user2ID = matchData.user2.user.id; console.log(user)
+					user2ID = matchData.user2.user.id; 
 					}
 					try {
 					const response = await axios({
@@ -169,7 +168,6 @@ const GameBoard = () => {
         if (result.isConfirmed) {
           console.log("the loser");
 		  router.replace("/lobby");
-		  router.replace("/lobby")
         }
       });
       return true;
@@ -245,7 +243,6 @@ const GameBoard = () => {
 					opponentPiece.color === opponentColor
 				) {
 					opponentGeneralPositon = { x: x, y: y };
-					console.log(opponentPiece);
 					break;
 				}
 			}
@@ -266,7 +263,6 @@ const GameBoard = () => {
 								move.y === opponentGeneralPositon.y
 						)
 					) {
-						console.log("Check:", piece);
 						return true;
 					}
 				}
@@ -300,7 +296,6 @@ const GameBoard = () => {
 	function filterCheckMoves(currentPlayer, validMoves, pieceInSelect) {
 		// Copy the current board to a new variable to simulate the moves
 		const opponentColor = currentPlayer === "red" ? "black" : "red";
-		console.log("OPC", opponentColor);
 		const piece = { ...pieceInSelect };
 		return validMoves.filter((move) => {
 			// Simulate the move
@@ -325,7 +320,6 @@ const GameBoard = () => {
 		movePiece(selectedPiece.position, position);
 		//  setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
 		// Unselect the piece and remove the highlights
-		console.log("board: ", board);
 		isSelected = false;
 		validMoves.forEach((move) => {
 			const cell = document.getElementById(`cell-${move.x}-${move.y}`);
@@ -344,7 +338,7 @@ const GameBoard = () => {
 				console.log("check");
 				Swal.fire({
 					position: "center",
-					icon: "info",
+					icon: "success",
 					title: "Check!",
 					showConfirmButton: false,
 					timer: 2000
@@ -397,7 +391,6 @@ const GameBoard = () => {
 					isSelected = false;
 					selectedPiece = null;
 				}
-				console.log(validMoves);
 				validMoves.forEach((move) => {
 					const cell = document.getElementById(`cell-${move.x}-${move.y}`);
 					if (cell) {
@@ -406,7 +399,6 @@ const GameBoard = () => {
 				});
 			} else {
 				// If a piece is selected and the clicked cell is a valid move
-				console.log(validMoves);
 				const id = event.currentTarget.id;
 				const parts = id.split("-");
 				const x = parseInt(parts[1]);
@@ -416,7 +408,6 @@ const GameBoard = () => {
 				const isValidMove = validMoves.some(
 					(move) => position.x === move.x && position.y === move.y
 				);
-				console.log(isValidMove);
 				if (isValidMove) {
 					handleOnMove(position);
 				}
@@ -436,7 +427,6 @@ const GameBoard = () => {
 				isSelected = false;
 				selectedPiece = null;
 			}
-			console.log(validMoves);
 			validMoves.forEach((move) => {
 				const cell = document.getElementById(`cell-${move.x}-${move.y}`);
 				if (cell) {
