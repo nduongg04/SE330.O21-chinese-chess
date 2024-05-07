@@ -119,7 +119,8 @@ const GameBoard = () => {
 			imageUrl: "https://unsplash.it/400/200",
 			imageWidth: 400,
 			imageHeight: 200,
-			imageAlt: "Custom image"
+			imageAlt: "Custom image",
+			allowOutsideClick: false
 		}).then((res)=>{
 			if(res.isConfirmed){
 				console.log("the winner");
@@ -163,7 +164,8 @@ const GameBoard = () => {
 			imageUrl: "https://unsplash.it/400/200",
 			imageWidth: 400,
 			imageHeight: 200,
-			imageAlt: "Custom image"
+			imageAlt: "Custom image",
+			allowOutsideClick: false
 		}).then((result) => {
         if (result.isConfirmed) {
           console.log("the loser");
