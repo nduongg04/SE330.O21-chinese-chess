@@ -9,6 +9,7 @@ import Chat from "@/components/game/Chat";
 import GameBoard from "./GameBoard";
 import { useSocket } from "@/hook/SocketHook";
 import { useSession } from "@/hook/AuthHook";
+import Swal from "sweetalert2";
 
 const Game = () => {
 	const router = useRouter();
@@ -46,14 +47,27 @@ const Game = () => {
 
     // handle surrender
 	const handleSurrender = () => {	
+		Swal.fire({
+			title: "Are you sure?",
+			text: "You won't be able to revert this!",
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#3085d6",
+			cancelButtonColor: "#d33",
+			confirmButtonText: "Yes, surrender!"
+		  }).then((result) => {
+			if (result.isConfirmed) {
+				if(socket== null) return;
+				const socketId = socketIDOponent()
+				const data = {
+					socketID: socketId
+				}
+				socket.emit("surrender", data)
+				router.replace("/lobby")
+			}
+		  });
 		console.log("sur")
-		if(socket== null) return;
-		const socketId = socketIDOponent()
-		const data = {
-			socketID: socketId
-		}
-		socket.emit("surrender", data)
-		router.replace("/lobby")
+		
 	};
 
 	return (
