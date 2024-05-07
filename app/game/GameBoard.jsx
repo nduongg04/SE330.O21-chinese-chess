@@ -40,6 +40,7 @@ const GameBoard = () => {
 	const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
 	//
 
+
 	const socketIDOponent = () => {
 		console.log(matchData);
 		if (matchData === null) return;
@@ -174,14 +175,21 @@ const GameBoard = () => {
       }).then((result) => {
         if (result.isConfirmed) {
           console.log("the loser");
+		  router.replace("/lobby")
         }
       });
-	  router.replace("/lobby")
+	  
       return true;
     }
     return false;
   }
 
+  //Test
+  useEffect(()=>{
+	comeForLose()
+	},[])
+
+//
   // Check for free win
   useEffect(()=>{
 	if(isWinner){
