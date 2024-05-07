@@ -58,9 +58,15 @@ const Game = () => {
 		  }).then((result) => {
 			if (result.isConfirmed) {
 				if(socket== null) return;
+				let user2ID = matchData.user1.user.id;
+				if (matchData.user1.user.id == user.id) {
+					user2ID = matchData.user2.user.id; 
+				}
 				const socketId = socketIDOponent()
 				const data = {
-					socketID: socketId
+					socketID: socketId,
+					user1ID: user2ID,
+					user2ID: user?.id
 				}
 				socket.emit("surrender", data)
 				router.replace("/lobby")
