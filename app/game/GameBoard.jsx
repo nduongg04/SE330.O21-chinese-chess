@@ -37,6 +37,7 @@ const GameBoard = () => {
 	const matchData = useSocket((state) => state.matchData);
 	const socket = useSocket((state) => state.socket);
 	const user = useSession((state) => state.user);
+	const setMessages = useSocket((state)=> state.setMessages)
 	const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
 	//
 
@@ -54,13 +55,22 @@ const GameBoard = () => {
 		router.replace("/lobby")
 	}
 
+
+	
 	useEffect(()=>{
 		if(socket==null) return;
 		const handleBeforeUnload = ()=>{
-			const socketID = socketIDOponent()
-			socket.emit("surrender", {
-				socketID: socketID
-			})
+			let user2ID = matchData.user1.user.id;
+			if (matchData.user1.user.id == user.id) {
+				user2ID = matchData.user2.user.id; 
+			}
+			const socketId = socketIDOponent()
+			const data = {
+				socketID: socketId,
+				user1ID: user2ID,
+				user2ID: user?.id
+			}
+			socket.emit("surrender", data)
 		}
 		window.addEventListener('beforeunload', handleBeforeUnload)
 		return () => {
@@ -77,7 +87,8 @@ const GameBoard = () => {
 	};
 	const currentPlayer = myColor();
 
-	useEffect(() => {    
+	useEffect(() => { 
+		setMessages([])
 		if (currentPlayer === "red") setIsYourTurn(true);
 	},[]);
 
@@ -94,6 +105,20 @@ const GameBoard = () => {
 		const opponentColor = currentPlayer === "red" ? "black" : "red";
 		if(isCheckMate(opponentColor,board)){
 			isLoser = true;
+			if(socket!=null){
+				let user2ID = matchData.user1.user.id;
+				if (matchData.user1.user.id == user.id) {
+					user2ID = matchData.user2.user.id; 
+				}
+				const socketId = socketIDOponent()
+				const data = {
+					socketID: socketId,
+					user1ID: user2ID,
+					user2ID: user?.id
+				}
+				socket.emit("surrender", data)
+			}
+			
 			comeForLose();
 		} else {
 			const check = isChecking(opponentColor, board);
@@ -113,29 +138,6 @@ const GameBoard = () => {
 
   const comeForWin = () =>{
     if(isWinner){
-		const createHistory = async () => {
-			let user2ID = matchData.user1.user.id;
-			if (matchData.user1.user.id == user.id) {
-			user2ID = matchData.user2.user.id; 
-			}
-			try {
-			const response = await axios({
-				method: "post",
-				url: `${baseUrl}/api/v1/history/create?winScore=10&loseScore=1`,
-				headers: {},
-				data: {
-				user1Id: user.id,
-				user2Id: user2ID,
-				user1Score: 1,
-				user2Score: 0,
-				},
-			});
-			console.log(response);
-			} catch (error) {
-				console.log("Error", error);
-			}
-		};
-		createHistory();
 		Swal.fire({
 			title: "Victory",
 			text: "You won the match!",
@@ -177,12 +179,6 @@ const GameBoard = () => {
     return false;
   }
 
-  //Test
-  useEffect(()=>{
-	comeForLose()
-	},[])
-
-//
   // Check for free win
   useEffect(()=>{
 	if(isWinner){
@@ -333,7 +329,7 @@ const GameBoard = () => {
 		const checkmate = isCheckMate(currentPlayer, board);
 		if (checkmate) {
 			isWinner = true
-			comeForWin();
+			//comeForWin();
 		} else {
 			const check = isChecking(currentPlayer, board);
 			if (check) {
