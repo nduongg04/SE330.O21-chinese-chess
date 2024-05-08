@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import NewGame from "@/components/lobby/NewGame";
 import Leaderboard from "@/components/lobby/Leaderboard";
 import { useRouter } from "next/navigation";
@@ -16,6 +16,7 @@ const Game = () => {
 	const matchData = useSocket((state)=>state.matchData)
 	const user = useSession((state) => state.user);
 	const socket = useSocket((state)=> state.socket)
+	
 	const buttonsInformation = [
 		{
 			iconReg: "/assets/chat-reg.svg",
@@ -30,6 +31,7 @@ const Game = () => {
 	];
 
 	const [buttonPressed, setButtonPressed] = useState("Chat");
+
 
 	const socketIDOponent = () => {
 		console.log(matchData);

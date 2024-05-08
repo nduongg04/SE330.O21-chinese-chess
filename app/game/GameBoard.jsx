@@ -37,6 +37,7 @@ const GameBoard = () => {
 	const matchData = useSocket((state) => state.matchData);
 	const socket = useSocket((state) => state.socket);
 	const user = useSession((state) => state.user);
+	const setMessages = useSocket((state)=> state.setMessages)
 	const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
 	//
 
@@ -86,7 +87,8 @@ const GameBoard = () => {
 	};
 	const currentPlayer = myColor();
 
-	useEffect(() => {    
+	useEffect(() => { 
+		setMessages([])
 		if (currentPlayer === "red") setIsYourTurn(true);
 	},[]);
 
