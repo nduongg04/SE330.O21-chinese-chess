@@ -4,6 +4,7 @@ import { useSession } from "@/hook/AuthHook";
 import { useSocket } from "@/hook/SocketHook";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
+import useIsFinding from "@/hook/useIsFinding";
 
 const NewGame = () => {
 	const socket = useSocket((state) => state.socket);
@@ -23,7 +24,9 @@ const NewGame = () => {
 		},
 	];
 
-	const [isFinding, setIsFinding] = useState(false);
+	const isFinding = useIsFinding((state) => state.isFinding);
+	const setIsFinding = useIsFinding((state) => state.setIsFinding);
+
 	const [selectedTime, setSelectedTime] = useState(0);
 	const [color, setColor] = useState("black");
 	const [textPlayButton, setTextPlayButton] = useState("Play");
@@ -37,13 +40,13 @@ const NewGame = () => {
 				color: color,
 			};
 			socket.emit("findMatch", data);
-			setIsFinding((prev) => !prev);
+			setIsFinding(true);
 
 			setTextPlayButton("Cancel");
 		} else {
 			socket.emit("cancelFindMatch", user.id);
 			setTextPlayButton("Play");
-			setIsFinding((prev) => !prev);
+			setIsFinding(false);
 		}
 	};
 
@@ -104,7 +107,7 @@ const NewGame = () => {
 							onClick={(e) => setColor("black")}
 						>
 							<Image
-                                alt="black-color"
+								alt="black-color"
 								src={`${
 									color === "black"
 										? "/assets/black-color-pressed.svg"
@@ -117,7 +120,7 @@ const NewGame = () => {
 						</button>
 						<button onClick={(e) => setColor("red")}>
 							<Image
-                                alt="red-color"
+								alt="red-color"
 								src={`${
 									color === "red"
 										? "/assets/red-color-pressed.svg"

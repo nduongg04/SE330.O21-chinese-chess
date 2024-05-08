@@ -71,6 +71,7 @@ const Login = () => {
 	};
 
 	const handleChange = (event) => {
+        setErrorMessage("");
 		setFormData({
 			...formData,
 			[event.target.name]: event.target.value,
@@ -132,12 +133,12 @@ const Login = () => {
 								/>
 							</div>
 
-							<Link
+							{/* <Link
 								href="/forgot-password"
 								className="text-right font-inter text-sm font-semibold hover:text-sky-500"
 							>
 								Forgot password?
-							</Link>
+							</Link> */}
 
 							{errorMessage && (
 								<span className="font-inter text-sm text-red-500">
@@ -147,7 +148,7 @@ const Login = () => {
 
 							<button
 								type="submit"
-								className="flex items-center justify-center rounded-md bg-sky-500 p-2 text-white hover:bg-sky-400 disabled:cursor-not-allowed disabled:bg-sky-300"
+								className="mt-3 flex items-center justify-center rounded-md bg-sky-500 p-2 text-white hover:bg-sky-400 disabled:cursor-not-allowed disabled:bg-sky-300"
 								disabled={isLoading}
 							>
 								{isLoading ? (
