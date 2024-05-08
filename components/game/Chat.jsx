@@ -1,93 +1,43 @@
 import Image from "next/image";
 import React, { useState, useRef, useEffect } from "react";
 import { useSession } from "../../hook/AuthHook";
+import { useSocket } from "@/hook/SocketHook";
 
 const Chat = () => {
 	const user = useSession((state) => state.user);
+	const matchData = useSocket((state)=> state.matchData);
+	const socket = useSocket((state)=> state.socket)
+	const [messages, setMessages] = useState([]);
 
-	const [messages, setMessages] = useState([
-		{
-			senderId: user?.id,
-			content: "Hello",
-			senderName: "John Doe",
-		},
-		{
-			senderId: 2,
-			content: "Hi",
-			senderName: "Jane Doe",
-		},
-		{
-			senderId: user?.id,
-			content: "How are you?",
-			senderName: "John Doe",
-		},
-		{
-			senderId: 2,
-			content: "I am fine",
-			senderName: "Jane Doe",
-		},
-		{
-			senderId: user?.id,
-			content: "What are you doing?",
-			senderName: "John Doe",
-		},
-		{
-			senderId: 2,
-			content: "I am playing chess",
-			senderName: "Jane Doe",
-		},
-		{
-			senderId: user?.id,
-			content: "Can I join you?",
-			senderName: "John Doe",
-		},
-		{
-			senderId: 2,
-			content: "Sure",
-			senderName: "Jane Doe",
-		},
-		{
-			senderId: user?.id,
-			content: "Where are you?",
-			senderName: "John Doe",
-		},
-		{
-			senderId: 2,
-			content: "I am at home",
-			senderName: "Jane Doe",
-		},
-		{
-			senderId: user?.id,
-			content: "I am coming",
-			senderName: "John Doe",
-		},
-		{
-			senderId: 2,
-			content: "Ok",
-			senderName: "Jane Doe",
-		},
-		{
-			senderId: user?.id,
-			content: "Bye",
-			senderName: "John Doe",
-		},
-		{
-			senderId: 2,
-			content: "Bye",
-			senderName: "Jane Doe",
-		},
-		{
-			senderId: user?.id,
-			content: "Goodnight",
-			senderName: "John Doe",
-		},
-		{
-			senderId: 2,
-			content: "Goodnight",
-			senderName: "Jane Doe",
-		},
-	]);
+	const socketIDOponent = () => {
+		console.log(matchData);
+		if (matchData === null) return;
+		if (matchData.user1.user.id == user.id) {
+			return matchData.user2.socketID;
+		}
+		return matchData.user1.socketID;
+	};
 
+	const nameOponent = () => {
+		console.log(matchData);
+		if (matchData === null) return;
+		if (matchData.user1.user.id == user.id) {
+			return matchData.user2.user.username;
+		}
+		return matchData.user1.user.username;
+	};
+	useEffect(()=>{
+		if(socket==null)return;
+		socket.on("getMessage", (data)=>{
+			const name = nameOponent()
+			const msg = {
+				senderId: data.senderId,
+				content: data.content,
+				senderName: name
+			}
+			setMessages([...messages, msg])
+		})
+	},[socket, messages])
 	const handleKeyDown = (e) => {
 		if (e.key === "Enter") {
 			setMessages([
@@ -98,6 +48,14 @@ const Chat = () => {
                     senderName: "You",
                 },
             ]);
+			if(socket==null) return
+			const socketId = socketIDOponent()
+			const dataMsg = {
+				senderId: user?.id,
+				content: e.target.value,
+				socketId: socketId
+			}
+			socket.emit("sendMessage", dataMsg)
             e.target.value = "";
 		}
 	};
@@ -120,6 +78,14 @@ const Chat = () => {
                 senderName: "You",
             },
         ]);
+		if(socket==null) return
+		const socketId = socketIDOponent()
+		const dataMsg = {
+			senderId: user?.id,
+			content: input.value,
+			socketId: socketId
+		}
+		socket.emit("sendMessage", dataMsg)
         input.value = "";
 	};
 

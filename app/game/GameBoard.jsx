@@ -10,80 +10,26 @@ import axios from "axios";
 import { match } from "assert";
 
 const GameBoard = () => {
-
-    
-
 	const router = useRouter();
-
-	const [board, setBoard] = useState(
-		[
-			[
-				"chariot",
-				"horse",
-				"elephant",
-				"advisor",
-				"general",
-				"advisor",
-				"elephant",
-				"horse",
-				"chariot",
-			],
-			[null, null, null, null, null, null, null, null, null],
-			[null, "cannon", null, null, null, null, null, "cannon", null],
-			[
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-			],
-			Array(9).fill(null),
-			Array(9).fill(null),
-			[
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-				null,
-				"soldier",
-			],
-			[null, "cannon", null, null, null, null, null, "cannon", null],
-			[null, null, null, null, null, null, null, null, null],
-			[
-				"chariot",
-				"horse",
-				"elephant",
-				"advisor",
-				"general",
-				"advisor",
-				"elephant",
-				"horse",
-				"chariot",
-			],
-		].map((row, rowIndex) =>
-			row.map((piece, colIndex) => {
-				const color = rowIndex < 5 ? "red" : "black";
-				return piece
-					? {
-							type: piece,
-							position: { x: rowIndex, y: colIndex },
-							color: color,
-					  }
-					: null;
-			})
-		)
-	);
+	const [board, setBoard]  = useState( [
+    ['chariot', 'horse', 'elephant', 'advisor', 'general', 'advisor', 'elephant', 'horse', 'chariot'],
+    [null, null, null, null, null, null, null, null, null],
+    [null, 'cannon', null, null, null, null, null, 'cannon', null],
+    ['soldier', null, 'soldier', null, 'soldier', null, 'soldier', null, 'soldier'],
+    Array(9).fill(null),
+    Array(9).fill(null),
+    ['soldier', null, 'soldier', null, 'soldier', null, 'soldier', null, 'soldier'],
+    [null, 'cannon', null, null, null, null, null, 'cannon', null],
+    [null, null, null, null, null, null, null, null, null],
+    ['chariot', 'horse', 'elephant', 'advisor', 'general', 'advisor', 'elephant', 'horse', 'chariot'],
+  ].map((row, rowIndex) => row.map((piece, colIndex) => {
+    const color = rowIndex < 5 ? 'red' : 'black';
+    return piece ? { type: piece, position: {x: rowIndex, y: colIndex}, color: color} : null;
+  })));
 
 	const [isYourTurn, setIsYourTurn] = useState(false);
-	const [isWinner, setWinner] = useState(false);
-	const [isLoser, setLoser] = useState(false);
+	let [isWinner, setWinner] = useState(false);
+	let [isLoser, setLoser] = useState(false);
 	let isSelected = false;
 	let selectedPiece = null;
 	let validMoves = [];
@@ -94,7 +40,6 @@ const GameBoard = () => {
 	const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
 	//
 
-    if (matchData === null) router.replace("/lobby");
 
 	const socketIDOponent = () => {
 		console.log(matchData);
@@ -104,7 +49,26 @@ const GameBoard = () => {
 		}
 		return matchData.user1.socketID;
 	};
+	
+    if (matchData === null) {
+		router.replace("/lobby")
+	}
 
+	useEffect(()=>{
+		if(socket==null) return;
+		const handleBeforeUnload = ()=>{
+			const socketID = socketIDOponent()
+			socket.emit("surrender", {
+				socketID: socketID
+			})
+		}
+		window.addEventListener('beforeunload', handleBeforeUnload)
+		return () => {
+			window.removeEventListener('beforeunload', handleBeforeUnload);
+		  };
+
+	},[socket])
+	
 	const myColor = () => {
 		if (matchData?.user1?.user?.id == user?.id) {
 			return matchData?.user1?.color;
@@ -113,40 +77,124 @@ const GameBoard = () => {
 	};
 	const currentPlayer = myColor();
 
-	useEffect(() => {
-        
+	useEffect(() => {    
 		if (currentPlayer === "red") setIsYourTurn(true);
-	});
+	},[]);
+
+	useEffect(()=>{
+		if(socket ==null) return;
+		socket.on("winner",(res)=>{
+			console.log("winner")
+			setWinner(true)
+		})
+	},[])
+
+	useEffect(() => {
+		// Get the opponent's color
+		const opponentColor = currentPlayer === "red" ? "black" : "red";
+		if(isCheckMate(opponentColor,board)){
+			isLoser = true;
+			comeForLose();
+		} else {
+			const check = isChecking(opponentColor, board);
+			if (check) {
+				console.log("check");
+				Swal.fire({
+					position: "center",
+					icon: "info",
+					title: "Check!",
+					showConfirmButton: false,
+					timer: 2000
+				});
+			}
+		}
+
+	  }, [board]);
+
+  const comeForWin = () =>{
+    if(isWinner){
+		const createHistory = async () => {
+			let user2ID = matchData.user1.user.id;
+			if (matchData.user1.user.id == user.id) {
+			user2ID = matchData.user2.user.id; 
+			}
+			try {
+			const response = await axios({
+				method: "post",
+				url: `${baseUrl}/api/v1/history/create?winScore=10&loseScore=1`,
+				headers: {},
+				data: {
+				user1Id: user.id,
+				user2Id: user2ID,
+				user1Score: 1,
+				user2Score: 0,
+				},
+			});
+			console.log(response);
+			} catch (error) {
+				console.log("Error", error);
+			}
+		};
+		createHistory();
+		Swal.fire({
+			title: "Victory",
+			text: "You won the match!",
+			imageUrl: "https://unsplash.it/400/200",
+			imageWidth: 400,
+			imageHeight: 200,
+			imageAlt: "Custom image",
+			allowOutsideClick: false
+		}).then((res)=>{
+			if(res.isConfirmed){
+				console.log("the winner");
+				router.replace("/lobby");
+			}
+		});
+      
+      return true;
+    }
+    return false;
+  }
+
+  const comeForLose= ()=>{
+    if (isLoser) {
+		Swal.fire({
+			title: "Defeat",
+			text: "You lost the match!",
+			imageUrl: "https://unsplash.it/400/200",
+			imageWidth: 400,
+			imageHeight: 200,
+			imageAlt: "Custom image",
+			allowOutsideClick: false
+		}).then((result) => {
+        if (result.isConfirmed) {
+          console.log("the loser");
+		  router.replace("/lobby");
+        }
+      });
+      return true;
+    }
+    return false;
+  }
+
+  //Test
+  useEffect(()=>{
+	comeForLose()
+	},[])
+
+//
+  // Check for free win
+  useEffect(()=>{
+	if(isWinner){
+		comeForWin();
+	}
+  },[isWinner])
 
 	const handleClickSocket = (event) => {
-		console.log(isYourTurn);
+    // Take the turn
 		if (isYourTurn === false) {
 			return;
 		} else {
-			// Get the opponent's color
-			const opponentColor = currentPlayer === "red" ? "black" : "red";
-			const beingcheckmate = isCheckMate(opponentColor, board);
-			if (beingcheckmate) {
-				setLoser(true);
-				Swal.fire({
-					title: "You lose the match!",
-					width: 600,
-					padding: "3em",
-					color: "#716add",
-					background:
-						"#fff url(https://sweetalert2.github.io/images/trees.png)",
-					backdrop: `
-            rgba(0,0,123,0.4)
-            url("https://sweetalert2.github.io/images/nyan-cat.gif")
-            left top
-            no-repeat
-          `,
-				}).then((result) => {
-					if (result.isConfirmed) {
-						console.log("the loser");
-					}
-				});
-			}
 			handleClick(event);
 		}
 	};
@@ -165,11 +213,12 @@ const GameBoard = () => {
 		};
 	}, []);
 
+
 	// End Socket
 	const movePiece = (currentPosition, newPosition) => {
 		board[newPosition.x][newPosition.y] = null;
 		board[newPosition.x][newPosition.y] =
-			board[currentPosition.x][currentPosition.y];
+		board[currentPosition.x][currentPosition.y];
 		board[currentPosition.x][currentPosition.y] = null;
 		board[newPosition.x][newPosition.y].position = {
 			x: newPosition.x,
@@ -196,7 +245,6 @@ const GameBoard = () => {
 					opponentPiece.color === opponentColor
 				) {
 					opponentGeneralPositon = { x: x, y: y };
-					console.log(opponentPiece);
 					break;
 				}
 			}
@@ -209,7 +257,6 @@ const GameBoard = () => {
 				if (piece && piece.color === currentPlayer) {
 					// Get the valid moves for this piece
 					let piecevalidMoves = getValidMoves(piece, board);
-					console.log("currentPiece", piece);
 					// If one of the valid moves for the current player's piece is this position, return true
 					if (
 						piecevalidMoves.some(
@@ -218,7 +265,6 @@ const GameBoard = () => {
 								move.y === opponentGeneralPositon.y
 						)
 					) {
-						console.log("Check:", piece);
 						return true;
 					}
 				}
@@ -252,7 +298,6 @@ const GameBoard = () => {
 	function filterCheckMoves(currentPlayer, validMoves, pieceInSelect) {
 		// Copy the current board to a new variable to simulate the moves
 		const opponentColor = currentPlayer === "red" ? "black" : "red";
-		console.log("OPC", opponentColor);
 		const piece = { ...pieceInSelect };
 		return validMoves.filter((move) => {
 			// Simulate the move
@@ -263,7 +308,6 @@ const GameBoard = () => {
 			);
 			simulatedBoard[move.x][move.y] = piece;
 			simulatedBoard[piece.position.x][piece.position.y] = null;
-			console.log(simulatedBoard);
 			// Check if the move would put the player in check
 			const wouldBeCheck = isChecking(opponentColor, simulatedBoard);
 			// If the move would not put the player in check, it's a valid move
@@ -278,7 +322,6 @@ const GameBoard = () => {
 		movePiece(selectedPiece.position, position);
 		//  setCurrentPlayer(currentPlayer === 'red' ? 'black' : 'red');
 		// Unselect the piece and remove the highlights
-		console.log("board: ", board);
 		isSelected = false;
 		validMoves.forEach((move) => {
 			const cell = document.getElementById(`cell-${move.x}-${move.y}`);
@@ -289,59 +332,36 @@ const GameBoard = () => {
 		validMoves = [];
 		const checkmate = isCheckMate(currentPlayer, board);
 		if (checkmate) {
-			setWinner(true);
-			Swal.fire({
-				title: "You win the match!",
-				width: 600,
-				padding: "3em",
-				color: "#716add",
-				background: "#fff url(https://sweetalert2.github.io/images/trees.png)",
-				backdrop: `
-            rgba(0,0,123,0.4)
-            url("https://sweetalert2.github.io/images/nyan-cat.gif")
-            left top
-            no-repeat
-          `,
-			}).then((result) => {
-				if (result.isConfirmed) {
-					console.log("the winner");
-					const createHistory = async () => {
-						let user2ID = matchData.user1.user.id;
-						if (matchData.user1.user.id == user.id) {
-							user2ID = matchData.user2.user.id;
-						}
-						try {
-							const response = await axios({
-								method: "post",
-								url: `${baseUrl}/api/v1/history/create?winScore=10&loseScore=1`,
-								headers: {},
-								data: {
-									user1Id: user.id,
-									user2Id: user2ID,
-									user1Score: 1,
-									user2Score: 0,
-								},
-							});
-
-							console.log(response.data);
-						} catch (error) {
-							console.log("Error", error);
-						}
-					};
-				}
-			});
+			isWinner = true
+			comeForWin();
 		} else {
 			const check = isChecking(currentPlayer, board);
 			if (check) {
 				console.log("check");
+				Swal.fire({
+					position: "center",
+					icon: "success",
+					title: "Check!",
+					showConfirmButton: false,
+					timer: 2000
+				});
 			}
 		}
-		if (checkmate) {
-			router.push("/lobby");
-		}
-		// Unselect the piece and remove the highlights
+    // Unselect the piece and remove the highlights
 		isSelected = false;
 		setIsYourTurn(false);
+    // Post
+		if (socket !== null) {
+		console.log("socket:", board);
+		const socketID = socketIDOponent();
+		console.log(socketID);
+		const data = {
+			board: board,
+			socketID: socketID,
+		};
+		console.log("SBoard:",data.board);
+		socket.emit("completeTurn", data);
+		}		
 	};
 
 	const handleClick = (event) => {
@@ -350,9 +370,6 @@ const GameBoard = () => {
 		let parts = id.split("-");
 		let x = parseInt(parts[1]);
 		let y = parseInt(parts[2]);
-		console.log(`Coordinates are (${x}, ${y})`);
-		console.log(board);
-		console.log(board[x][y]);
 		if (isSelected && selectedPiece) {
 			if (
 				board[x][y] &&
@@ -376,7 +393,6 @@ const GameBoard = () => {
 					isSelected = false;
 					selectedPiece = null;
 				}
-				console.log(validMoves);
 				validMoves.forEach((move) => {
 					const cell = document.getElementById(`cell-${move.x}-${move.y}`);
 					if (cell) {
@@ -385,7 +401,6 @@ const GameBoard = () => {
 				});
 			} else {
 				// If a piece is selected and the clicked cell is a valid move
-				console.log(validMoves);
 				const id = event.currentTarget.id;
 				const parts = id.split("-");
 				const x = parseInt(parts[1]);
@@ -395,20 +410,8 @@ const GameBoard = () => {
 				const isValidMove = validMoves.some(
 					(move) => position.x === move.x && position.y === move.y
 				);
-				console.log(isValidMove);
 				if (isValidMove) {
 					handleOnMove(position);
-					if (socket !== null) {
-						console.log("socket:", board);
-						const socketID = socketIDOponent();
-						console.log(socketID);
-						const data = {
-							board: board,
-							socketID: socketID,
-						};
-						console.log(data.board);
-						socket.emit("completeTurn", data);
-					}
 				}
 			}
 		} else if (
@@ -426,7 +429,6 @@ const GameBoard = () => {
 				isSelected = false;
 				selectedPiece = null;
 			}
-			console.log(validMoves);
 			validMoves.forEach((move) => {
 				const cell = document.getElementById(`cell-${move.x}-${move.y}`);
 				if (cell) {

@@ -7,9 +7,15 @@ import Leaderboard from "@/components/lobby/Leaderboard";
 import { useRouter } from "next/navigation";
 import Chat from "@/components/game/Chat";
 import GameBoard from "./GameBoard";
+import { useSocket } from "@/hook/SocketHook";
+import { useSession } from "@/hook/AuthHook";
+import Swal from "sweetalert2";
 
 const Game = () => {
 	const router = useRouter();
+	const matchData = useSocket((state)=>state.matchData)
+	const user = useSession((state) => state.user);
+	const socket = useSocket((state)=> state.socket)
 	const buttonsInformation = [
 		{
 			iconReg: "/assets/chat-reg.svg",
@@ -25,6 +31,15 @@ const Game = () => {
 
 	const [buttonPressed, setButtonPressed] = useState("Chat");
 
+	const socketIDOponent = () => {
+		console.log(matchData);
+		if (matchData === null) return;
+		if (matchData.user1.user.id == user.id) {
+			return matchData.user2.socketID;
+		}
+		return matchData.user1.socketID;
+	};
+
 	const componentsMap = {
 		Chat: <Chat />,
 		Leaderboard: <Leaderboard />,
@@ -32,6 +47,26 @@ const Game = () => {
 
     // handle surrender
 	const handleSurrender = () => {	
+		Swal.fire({
+			title: "Are you sure?",
+			text: "You won't be able to revert this!",
+			icon: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#3085d6",
+			cancelButtonColor: "#d33",
+			confirmButtonText: "Yes, surrender!"
+		  }).then((result) => {
+			if (result.isConfirmed) {
+				if(socket== null) return;
+				const socketId = socketIDOponent()
+				const data = {
+					socketID: socketId
+				}
+				socket.emit("surrender", data)
+				router.replace("/lobby")
+			}
+		  });
+		console.log("sur")
 		
 	};
 
