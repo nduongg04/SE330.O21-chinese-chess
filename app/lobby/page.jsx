@@ -21,6 +21,9 @@ const Lobby = () => {
 	const [isMatch, setIsMatch] = useState(false);
 	const router = useRouter();
 
+    const isFinding = useIsFinding((state) => state.isFinding);
+	const setIsFinding = useIsFinding((state) => state.setIsFinding);
+
 	const socketIDOponent = () => {
 		console.log(matchData);
 		if (matchData === null) return;
@@ -32,6 +35,9 @@ const Lobby = () => {
 
 
 	useEffect(() => {
+
+        setIsFinding(false);
+
 		if (user == null) router.replace("/login");
 		const newSocket = io("https://chinesechess-socket.onrender.com");
 		setSocket(newSocket);
@@ -79,8 +85,7 @@ const Lobby = () => {
 		},
 	];
 
-	const isFinding = useIsFinding((state) => state.isFinding);
-	const setIsFinding = useIsFinding((state) => state.setIsFinding);
+	
 
 	const [buttonPressed, setButtonPressed] = useState("New game");
 
