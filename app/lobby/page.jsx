@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useSocket } from "@/hook/SocketHook";
 import { useSession } from "@/hook/AuthHook";
 import { io } from "socket.io-client";
+import useIsFinding from "@/hook/useIsFinding";
 
 const Lobby = () => {
 	const user = useSession((state) => state.user);
@@ -66,6 +67,9 @@ const Lobby = () => {
 		},
 	];
 
+	const isFinding = useIsFinding((state) => state.isFinding);
+	const setIsFinding = useIsFinding((state) => state.setIsFinding);
+
 	const [buttonPressed, setButtonPressed] = useState("New game");
 
 	const componentsMap = {
@@ -89,8 +93,13 @@ const Lobby = () => {
 			>
 				<Image alt="logout" src="/assets/logout.svg" width={45} height={45} />
 			</button>
-			<div className="xl:block hidden w-[854px] bg-red-300">
-				Bàn cờ + player
+			<div className="xl:flex mr-6 hidden justify-center">
+				<Image
+					alt="Chinese Chess"
+					src="/assets/lobby.jpg"
+					width={400}
+					height={600}
+				/>
 			</div>
 
 			<div className="flex items-center justify-center my-11">
@@ -100,7 +109,8 @@ const Lobby = () => {
 						{buttonsInformation.map((button, index) => (
 							<button
 								key={index}
-								className={`flex-1 flex justify-center items-center flex-col border-x border-gray-300 ${
+								disabled={isFinding}
+								className={`disabled:opacity-50 flex-1 flex justify-center items-center flex-col border-x border-gray-300 ${
 									buttonPressed === button.text ? "bg-white" : "bg-slate-200"
 								} `}
 								onClick={() => setButtonPressed(button.text)}
