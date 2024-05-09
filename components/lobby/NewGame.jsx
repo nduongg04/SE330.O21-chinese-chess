@@ -31,8 +31,9 @@ const NewGame = () => {
 	const handleClickPlay = () => {
 		if (textPlayButton == "Play") {
 			if (socket == null) return;
+			console.log(selectedTime)
 			const data = {
-				min: times[selectedTime].time,
+				min: selectedTime,
 				user: user,
 				color: color,
 			};
