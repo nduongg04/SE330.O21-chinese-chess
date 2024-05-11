@@ -27,7 +27,7 @@ const NewGame = () => {
 	const isFinding = useIsFinding((state) => state.isFinding);
 	const setIsFinding = useIsFinding((state) => state.setIsFinding);
 
-	const [selectedTime, setSelectedTime] = useState(0);
+	const [selectedTime, setSelectedTime] = useState(10);
 	const [color, setColor] = useState("black");
 	const [textPlayButton, setTextPlayButton] = useState("Play");
 
@@ -36,7 +36,7 @@ const NewGame = () => {
 			if (socket == null) return;
 			console.log(selectedTime)
 			const data = {
-				min: selectedTime,
+				min: parseInt(selectedTime),
 				user: user,
 				color: color,
 			};

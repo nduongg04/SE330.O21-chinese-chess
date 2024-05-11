@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { use, useEffect, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import NewGame from "@/components/lobby/NewGame";
 import Leaderboard from "@/components/lobby/Leaderboard";
 import { useRouter } from "next/navigation";
@@ -12,6 +12,8 @@ import { useSession } from "@/hook/AuthHook";
 import Swal from "sweetalert2";
 import Timer from "./Timer";
 import Username from "./Username";
+
+
 
 const Game = () => {
 	const router = useRouter();
@@ -91,9 +93,7 @@ const Game = () => {
 				<Image alt="surrender" src="/assets/surrender.png" width={45} height={45} />
 			</button>
 			<div className="xl:block hidden w-[854px] flex flex-col items-center">
-				<Timer color="red" />
 				<GameBoard/>
-				<Timer color="black" />
 			</div>
 
 			<div className="flex items-center justify-center my-11">
