@@ -24,7 +24,7 @@ const Timer = React.forwardRef(( props, ref) => {
         console.log(timercolor)
         return () => {
             clearInterval(intervalRef.current);
-            setTime({minutes: 0, seconds: 10});
+            setTime({minutes: matchData?.user1?.min, seconds: 0});
         };
     }, []);
 
