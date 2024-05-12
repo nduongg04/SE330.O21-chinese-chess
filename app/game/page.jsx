@@ -84,8 +84,6 @@ const Game = () => {
 
 	return (
 		<div className="flex gap-7 justify-center items-center">
-			<Username top={0} left={20} player={matchData && matchData.user1.user.name} /> {/* Username of player 1 */}
-			<Username bot={0} right={20} player={matchData && matchData.user2.user.name} /> {/* Username of player 2 */}
 			<button
 				onClick={handleSurrender}
 				className="bg-red-500 rounded-lg absolute bottom-3 right-3 hover:shadow-xl shadow-indigo-400"
