@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import { match } from "assert";
 import Timer from "./Timer";
+import Username from "./Username";
 
 const GameBoard = () => {
 	const router = useRouter();
@@ -477,6 +478,7 @@ const GameBoard = () => {
 	return (
 		<div className="container">
 			<Timer ref={redTimerRef} timercolor="red" currentUser={currentPlayer} setLoser={setLoser} />
+			<Username timercolor="red" currentUser={currentPlayer} />
 			<div className="chess-board">
 				{board.map((row, i) =>
 					row.map((piece, j) => {
@@ -503,6 +505,7 @@ const GameBoard = () => {
 				)}
 			</div>
 			<Timer ref={blackTimerRef} timercolor="black" currentUser={currentPlayer} setLoser={setLoser} />
+			<Username timercolor="black" currentUser={currentPlayer} />
 		</div>
 	);
 };

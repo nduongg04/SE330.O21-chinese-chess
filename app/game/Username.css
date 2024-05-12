@@ -1,5 +1,8 @@
 .username-container {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 240px;
 }
 
 .username {
@@ -17,6 +20,11 @@
     background-size: cover;
 }
 
+.general-icon {
+    width: 24px;
+    margin-left: 8px;
+}
+
 .player1 {
     background-image: url('/public/assets/PlayerAvatar.png');
 }
@@ -31,4 +39,16 @@
 
 .black {
     color: black;
+}
+
+.active {
+    font-weight: bold;
+}
+
+.red.active {
+    order: 1;
+}
+
+.black.active {
+    order: 3;
 }
