@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import NewGame from "@/components/lobby/NewGame";
 import Leaderboard from "@/components/lobby/Leaderboard";
 import { useRouter } from "next/navigation";
@@ -13,11 +13,14 @@ import Swal from "sweetalert2";
 import Timer from "./Timer";
 import Username from "./Username";
 
+
+
 const Game = () => {
 	const router = useRouter();
 	const matchData = useSocket((state)=>state.matchData)
 	const user = useSession((state) => state.user);
 	const socket = useSocket((state)=> state.socket)
+	
 	const buttonsInformation = [
 		{
 			iconReg: "/assets/chat-reg.svg",
@@ -32,6 +35,7 @@ const Game = () => {
 	];
 
 	const [buttonPressed, setButtonPressed] = useState("Chat");
+
 
 	const socketIDOponent = () => {
 		console.log(matchData);
@@ -89,9 +93,7 @@ const Game = () => {
 				<Image alt="surrender" src="/assets/surrender.png" width={45} height={45} />
 			</button>
 			<div className="xl:block hidden w-[854px] flex flex-col items-center">
-				<Timer color="red" />
 				<GameBoard/>
-				<Timer color="black" />
 			</div>
 
 			<div className="flex items-center justify-center my-11">

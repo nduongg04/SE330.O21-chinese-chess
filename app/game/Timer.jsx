@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useImperativeHandle } from 'react';
 import { useSocket } from "@/hook/SocketHook";
 import { useSession } from "@/hook/AuthHook";
 import { useRouter } from "next/navigation";
@@ -6,41 +6,33 @@ import axios from "axios";
 import { match } from "assert";
 import './Timer.css';
 
-const Timer = ({ timercolor }) => {
+const Timer = React.forwardRef(( props, ref) => {
+    const {timercolor, currentUser, setLoser} = props
     const [time, setTime] = useState({
         minutes: 10,
         seconds: 0
     });
     const [isRunning, setIsRunning] = useState(false);
     const intervalRef = useRef(null);
-    const [isYourTurn, setIsYourTurn] = useState(false);
     // socket
     const matchData = useSocket((state) => state.matchData);
 	const socket = useSocket((state) => state.socket);
 	const user = useSession((state) => state.user);
     // socket
     useEffect(() => {
+        console.log(currentUser)
+        console.log(timercolor)
         return () => {
             clearInterval(intervalRef.current);
-            setTime({minutes: matchData.user1.min, seconds: 0});
+            setTime({minutes: matchData?.user1?.min, seconds: 0});
         };
     }, []);
 
-    const myColor = () => {
-		if (matchData?.user1?.user?.id == user?.id) {
-			return matchData?.user1?.color;
-		}
-		return matchData?.user2?.color;
-	};
-	const color = myColor();
-
-    useEffect(() => {    
-		if (color === "red") setIsYourTurn(true);
-	},[]);
+   
 
     const startTimer = () => {
-        if (!isRunning && isYourTurn) {
             setIsRunning(true);
+            console.log("Helu")
             intervalRef.current = setInterval(() => {
                 setTime(prevTime => {
                     if (prevTime.minutes === 0 && prevTime.seconds === 0) {
@@ -61,8 +53,9 @@ const Timer = ({ timercolor }) => {
                     }
                 });
             }, 1000);
-        }
     };
+
+    
 
     const pauseTimer = () => {
         setIsRunning(false);
@@ -71,11 +64,22 @@ const Timer = ({ timercolor }) => {
 
     const timesUp = () => {
         if(time.minutes === 0 && time.seconds === 0){
-            pauseTimer();
-            return color;
+            return true;
         }
+        return false
     };
 
+    useEffect(()=>{
+        if(timercolor==currentUser && timesUp()){
+            setLoser(true)
+        }
+    },[time])
+
+    useImperativeHandle(ref,()=>({
+        startTimer,
+        pauseTimer,
+        timesUp
+    }))
     return (
         <div className={`timer ${timercolor}`}>
             <div>
@@ -83,6 +87,6 @@ const Timer = ({ timercolor }) => {
             </div>
         </div>
     );
-};
+});
 
 export default Timer;

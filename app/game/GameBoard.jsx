@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import ChessPiece from "./ChessPiece";
 import "./GameBoard.css";
 import getValidMoves from "./getValidMoves";
@@ -8,9 +8,12 @@ import { useSession } from "@/hook/AuthHook";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import { match } from "assert";
+import Timer from "./Timer";
 
 const GameBoard = () => {
 	const router = useRouter();
+	const redTimerRef = useRef()
+	const blackTimerRef= useRef()
 	const [board, setBoard]  = useState( [
     ['chariot', 'horse', 'elephant', 'advisor', 'general', 'advisor', 'elephant', 'horse', 'chariot'],
     [null, null, null, null, null, null, null, null, null],
@@ -37,9 +40,17 @@ const GameBoard = () => {
 	const matchData = useSocket((state) => state.matchData);
 	const socket = useSocket((state) => state.socket);
 	const user = useSession((state) => state.user);
+	const setMessages = useSocket((state)=> state.setMessages)
 	const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
 	//
 
+	const myColor = () => {
+		if (matchData?.user1?.user?.id == user?.id) {
+			return matchData?.user1?.color;
+		}
+		return matchData?.user2?.color;
+	};
+	const currentPlayer = myColor();
 
 	const socketIDOponent = () => {
 		console.log(matchData);
@@ -78,17 +89,27 @@ const GameBoard = () => {
 
 	},[socket])
 	
-	const myColor = () => {
-		if (matchData?.user1?.user?.id == user?.id) {
-			return matchData?.user1?.color;
+	
+	useEffect(() => { 
+		setMessages([])
+		redTimerRef.current.startTimer()
+		if (currentPlayer === "red") {
+			setIsYourTurn(true);
 		}
-		return matchData?.user2?.color;
-	};
-	const currentPlayer = myColor();
-
-	useEffect(() => {    
-		if (currentPlayer === "red") setIsYourTurn(true);
 	},[]);
+
+	useEffect(()=>{
+		if(currentPlayer=='red'){
+			console.log(redTimerRef.current.timesUp())
+			if(redTimerRef.current.timesUp()){
+				setLoser(true)
+			}
+		}else{
+			if(blackTimerRef.current.timesUp()){
+				setLoser(true)
+			}
+		}
+	})
 
 	useEffect(()=>{
 		if(socket ==null) return;
@@ -98,26 +119,31 @@ const GameBoard = () => {
 		})
 	},[])
 
+	useEffect(()=>{
+		if(socket==null)return
+		if(isLoser == true){
+			let user2ID = matchData.user1.user.id;
+			if (matchData.user1.user.id == user.id) {
+				user2ID = matchData.user2.user.id; 
+			}
+			const socketId = socketIDOponent()
+			const data = {
+				socketID: socketId,
+				user1ID: user2ID,
+				user2ID: user?.id
+			}
+			socket.emit("surrender", data)
+		}
+		
+		comeForLose();
+	},[isLoser])
+
 	useEffect(() => {
 		// Get the opponent's color
 		const opponentColor = currentPlayer === "red" ? "black" : "red";
 		if(isCheckMate(opponentColor,board)){
-			isLoser = true;
-			if(socket!=null){
-				let user2ID = matchData.user1.user.id;
-				if (matchData.user1.user.id == user.id) {
-					user2ID = matchData.user2.user.id; 
-				}
-				const socketId = socketIDOponent()
-				const data = {
-					socketID: socketId,
-					user1ID: user2ID,
-					user2ID: user?.id
-				}
-				socket.emit("surrender", data)
-			}
+			setLoser(true);
 			
-			comeForLose();
 		} else {
 			const check = isChecking(opponentColor, board);
 			if (check) {
@@ -198,8 +224,16 @@ const GameBoard = () => {
 		console.log("Board change");
 		socket.on("getTurn", (newBoard) => {
 			console.log("Socket:", newBoard);
+			if(currentPlayer=='red'){
+				redTimerRef.current.startTimer()
+				blackTimerRef.current.pauseTimer()
+			}else{
+				redTimerRef.current.pauseTimer()
+				blackTimerRef.current.startTimer()
+			}
 			setBoard(newBoard);
 			setIsYourTurn(true);
+			
 		});
 
 		return () => {
@@ -345,16 +379,24 @@ const GameBoard = () => {
 		isSelected = false;
 		setIsYourTurn(false);
     // Post
+		if(currentPlayer=='red'){
+			redTimerRef.current.pauseTimer()
+			blackTimerRef.current.startTimer()
+		}else{
+			redTimer.current.startTimer()
+			blackTimerRef.current.pauseTimer()
+		}
 		if (socket !== null) {
-		console.log("socket:", board);
-		const socketID = socketIDOponent();
-		console.log(socketID);
-		const data = {
-			board: board,
-			socketID: socketID,
-		};
-		console.log("SBoard:",data.board);
-		socket.emit("completeTurn", data);
+			console.log("socket:", board);
+			const socketID = socketIDOponent();
+			console.log(socketID);
+			const data = {
+				board: board,
+				socketID: socketID,
+			};
+			console.log("SBoard:",data.board);
+			socket.emit("completeTurn", data);
+			
 		}		
 	};
 
@@ -434,6 +476,7 @@ const GameBoard = () => {
 
 	return (
 		<div className="container">
+			<Timer ref={redTimerRef} timercolor="red" currentUser={currentPlayer} setLoser={setLoser} />
 			<div className="chess-board">
 				{board.map((row, i) =>
 					row.map((piece, j) => {
@@ -459,6 +502,7 @@ const GameBoard = () => {
 					})
 				)}
 			</div>
+			<Timer ref={blackTimerRef} timercolor="black" currentUser={currentPlayer} setLoser={setLoser} />
 		</div>
 	);
 };

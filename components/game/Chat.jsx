@@ -7,7 +7,8 @@ const Chat = () => {
 	const user = useSession((state) => state.user);
 	const matchData = useSocket((state)=> state.matchData);
 	const socket = useSocket((state)=> state.socket)
-	const [messages, setMessages] = useState([]);
+	const messages = useSocket((state)=> state.messages)
+	const setMessages = useSocket((state)=> state.setMessages)
 
 	const socketIDOponent = () => {
 		console.log(matchData);
@@ -26,67 +27,72 @@ const Chat = () => {
 		}
 		return matchData.user1.user.username;
 	};
-	useEffect(()=>{
-		if(socket==null)return;
-		socket.on("getMessage", (data)=>{
-			const name = nameOponent()
+	useEffect(() => {
+		if (socket == null) return;
+		socket.on("getMessage", (data) => {
+			const name = nameOponent();
 			const msg = {
 				senderId: data.senderId,
 				content: data.content,
-				senderName: name
-			}
-			setMessages([...messages, msg])
-		})
-	},[socket, messages])
+				senderName: name,
+			};
+			setMessages([...messages, msg]);
+		});
+	}, [socket, messages]);
 	const handleKeyDown = (e) => {
 		if (e.key === "Enter") {
+			if (!e.target.value || e.target.value === "") return;
+
 			setMessages([
-                ...messages,
-                {
-                    senderId: user?.id,
-                    content: e.target.value,
-                    senderName: "You",
-                },
-            ]);
-			if(socket==null) return
-			const socketId = socketIDOponent()
+				...messages,
+				{
+					senderId: user?.id,
+					content: e.target.value,
+					senderName: "You",
+				},
+			]);
+			if (socket == null) return;
+			const socketId = socketIDOponent();
 			const dataMsg = {
 				senderId: user?.id,
 				content: e.target.value,
-				socketId: socketId
-			}
-			socket.emit("sendMessage", dataMsg)
-            e.target.value = "";
+				socketId: socketId,
+			};
+			socket.emit("sendMessage", dataMsg);
+			e.target.value = "";
 		}
 	};
 
-    const messagesEndRef = useRef(null);
+	const messagesEndRef = useRef(null);
 
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+	const scrollToBottom = () => {
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+	};
 
-    useEffect(scrollToBottom, [messages]);
+	useEffect(scrollToBottom, [messages]);
 
 	const handleClick = () => {
 		const input = document.querySelector("input");
-        setMessages([
-            ...messages,
-            {
-                senderId: user?.id,
-                content: input.value,
-                senderName: "You",
-            },
-        ]);
-		if(socket==null) return
-		const socketId = socketIDOponent()
+
+		if (!input.value || input.value === "") return;
+
+		setMessages([
+			...messages,
+			{
+				senderId: user?.id,
+				content: input.value,
+				senderName: "You",
+			},
+		]);
+		if (socket == null) return;
+		const socketId = socketIDOponent();
 		const dataMsg = {
 			senderId: user?.id,
 			content: input.value,
-			socketId: socketId
-		}
-		socket.emit("sendMessage", dataMsg)
-        input.value = "";
+			socketId: socketId,
+		};
+		socket.emit("sendMessage", dataMsg);
+		input.value = "";
 	};
 
 	return (
@@ -115,7 +121,7 @@ const Chat = () => {
 						</div>
 					</div>
 				))}
-                <div ref={messagesEndRef} />
+				<div ref={messagesEndRef} />
 			</div>
 
 			<div className="flex w-full h-10 px-2 gap-2">
