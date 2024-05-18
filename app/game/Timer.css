@@ -7,11 +7,19 @@
     right: 720px;
 }
 
-.timer:first-child {
+/*.timer:first-child {
     top: 0;
 }
 
 .timer:last-child {
     bottom: 0;
 }
+*/
 
+.timer.red {
+    top: 0px;
+}
+
+.timer.black {
+    bottom: 0px;
+}
