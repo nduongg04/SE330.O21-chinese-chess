@@ -1,54 +1,44 @@
-.username-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 240px;
+.username {
+    position: absolute;
+    right: 0;
+    font-size: 24px;
+    font-weight: bold;
+    color: black;
+    right: 1200px;
 }
 
-.username {
-    display: flex;
-    align-items: center;
-    font-size: 18px;
-    font-weight: bold;
-    margin-right: 20px;
+/*.username:first-child {
+    top: 0;
 }
+
+.username:last-child {
+    bottom: 0;
+}
+*/
 
 .avatar {
-    width: 24px;
-    height: 24px;
-    margin-right: 8px;
-    background-size: cover;
+    position: absolute;
+    left: -40px;
+    width: 40px;
+    height: 40px;
 }
 
-.general-icon {
-    width: 24px;
-    margin-left: 8px;
+.piece-image {
+    position: absolute;
+    top: 5%;
+    right: -50px;
+    width: 40px;
+    height: 40px;
 }
 
-.player1 {
-    background-image: url('/public/assets/PlayerAvatar.png');
+.player-name {
+    margin-left: 10px;
 }
 
-.player2 {  
-    background-image: url('/public/assets/PlayerAvatar.png');
+.username.red {
+    top: 0;
 }
 
-.red {
-    color: red;
-}
-
-.black {
-    color: black;
-}
-
-.active {
-    font-weight: bold;
-}
-
-.red.active {
-    order: 1;
-}
-
-.black.active {
-    order: 3;
+.username.black {
+    bottom: 0;
 }

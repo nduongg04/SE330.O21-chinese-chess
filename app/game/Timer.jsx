@@ -80,6 +80,7 @@ const Timer = React.forwardRef(( props, ref) => {
         pauseTimer,
         timesUp
     }))
+
     return (
         <div className={`timer ${timercolor}`}>
             <div>
