@@ -4,20 +4,20 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {useSession} from "@/hook/AuthHook"
+import { useSession } from "@/hook/AuthHook";
 
 const Login = () => {
-	const setUser = useSession((state)=> state.setUser)
+	const setUser = useSession((state) => state.setUser);
 	useEffect(() => {
 		const getRefreshToken = () => {
 			const refreshToken = localStorage.getItem("refreshToken");
 
 			if (refreshToken) {
 				const user = JSON.parse(localStorage.getItem("user"));
-				console.log(user)
-				setUser(user)
+				console.log(user);
+				setUser(user);
 				router.push("/lobby");
-                return;
+				return;
 			}
 		};
 
@@ -37,6 +37,12 @@ const Login = () => {
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		setIsLoading(true);
+		const resultPingSocket = await fetch("https://chinesechess-socket.onrender.com/ping", {
+			method: "GET",
+		});
+
+        console.log(resultPingSocket)
+
 		try {
 			const response = await fetch(`${baseUrl}/api/v1/auth/login`, {
 				method: "POST",
@@ -46,11 +52,11 @@ const Login = () => {
 				body: JSON.stringify(formData),
 			});
 
-            console.log(response)
+			console.log(response);
 
 			if (response.status === 401) {
 				setErrorMessage("Invalid email or password. Please try again.");
-                return;
+				return;
 			} else if (response.status !== 200) {
 				setErrorMessage("Something went wrong. Please try again later.");
 				return;
@@ -58,8 +64,8 @@ const Login = () => {
 				const data = await response.json();
 				localStorage.setItem("accessToken", data.access_token);
 				localStorage.setItem("refreshToken", data.refresh_token);
-				localStorage.setItem("user",JSON.stringify(data.data))
-				setUser(data.data)
+				localStorage.setItem("user", JSON.stringify(data.data));
+				setUser(data.data);
 				router.push("/lobby");
 			}
 		} catch (error) {
@@ -71,7 +77,7 @@ const Login = () => {
 	};
 
 	const handleChange = (event) => {
-        setErrorMessage("");
+		setErrorMessage("");
 		setFormData({
 			...formData,
 			[event.target.name]: event.target.value,

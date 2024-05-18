@@ -78,7 +78,7 @@ const Game = () => {
 			>
 				<Image alt="surrender" src="/assets/surrender.png" width={45} height={45} />
 			</button>
-			<div className="xl:block hidden w-[854px]">
+			<div className="w-[854px]">
 				<GameBoard/>
 			</div>
 
