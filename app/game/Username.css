@@ -1,0 +1,54 @@
+.username-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 240px;
+}
+
+.username {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+.avatar {
+    width: 24px;
+    height: 24px;
+    margin-right: 8px;
+    background-size: cover;
+}
+
+.general-icon {
+    width: 24px;
+    margin-left: 8px;
+}
+
+.player1 {
+    background-image: url('/public/assets/PlayerAvatar.png');
+}
+
+.player2 {  
+    background-image: url('/public/assets/PlayerAvatar.png');
+}
+
+.red {
+    color: red;
+}
+
+.black {
+    color: black;
+}
+
+.active {
+    font-weight: bold;
+}
+
+.red.active {
+    order: 1;
+}
+
+.black.active {
+    order: 3;
+}

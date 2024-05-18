@@ -5,9 +5,10 @@ import { useSocket } from "@/hook/SocketHook";
 
 const Chat = () => {
 	const user = useSession((state) => state.user);
-	const matchData = useSocket((state) => state.matchData);
-	const socket = useSocket((state) => state.socket);
-	const [messages, setMessages] = useState([]);
+	const matchData = useSocket((state)=> state.matchData);
+	const socket = useSocket((state)=> state.socket)
+	const messages = useSocket((state)=> state.messages)
+	const setMessages = useSocket((state)=> state.setMessages)
 
 	const socketIDOponent = () => {
 		console.log(matchData);

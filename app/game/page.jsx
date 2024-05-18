@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import NewGame from "@/components/lobby/NewGame";
 import Leaderboard from "@/components/lobby/Leaderboard";
 import { useRouter } from "next/navigation";
@@ -10,12 +10,17 @@ import GameBoard from "./GameBoard";
 import { useSocket } from "@/hook/SocketHook";
 import { useSession } from "@/hook/AuthHook";
 import Swal from "sweetalert2";
+import Timer from "./Timer";
+import Username from "./Username";
+
+
 
 const Game = () => {
 	const router = useRouter();
 	const matchData = useSocket((state)=>state.matchData)
 	const user = useSession((state) => state.user);
 	const socket = useSocket((state)=> state.socket)
+	
 	const buttonsInformation = [
 		{
 			iconReg: "/assets/chat-reg.svg",
@@ -30,6 +35,7 @@ const Game = () => {
 	];
 
 	const [buttonPressed, setButtonPressed] = useState("Chat");
+
 
 	const socketIDOponent = () => {
 		console.log(matchData);
@@ -58,9 +64,15 @@ const Game = () => {
 		  }).then((result) => {
 			if (result.isConfirmed) {
 				if(socket== null) return;
+				let user2ID = matchData.user1.user.id;
+				if (matchData.user1.user.id == user.id) {
+					user2ID = matchData.user2.user.id; 
+				}
 				const socketId = socketIDOponent()
 				const data = {
-					socketID: socketId
+					socketID: socketId,
+					user1ID: user2ID,
+					user2ID: user?.id
 				}
 				socket.emit("surrender", data)
 				router.replace("/lobby")
@@ -78,7 +90,7 @@ const Game = () => {
 			>
 				<Image alt="surrender" src="/assets/surrender.png" width={45} height={45} />
 			</button>
-			<div className="w-[854px]">
+			<div className="xl:block hidden w-[854px] flex flex-col items-center">
 				<GameBoard/>
 			</div>
 
