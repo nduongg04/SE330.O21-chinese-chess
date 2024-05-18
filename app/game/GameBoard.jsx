@@ -384,7 +384,7 @@ const GameBoard = () => {
 			redTimerRef.current.pauseTimer()
 			blackTimerRef.current.startTimer()
 		}else{
-			redTimer.current.startTimer()
+			redTimerRef.current.startTimer()
 			blackTimerRef.current.pauseTimer()
 		}
 		if (socket !== null) {
@@ -476,9 +476,9 @@ const GameBoard = () => {
 	};
 
 	return (
-		<div className="container">
+		<div className="container">	
+			<Username color="red" playerName="Player 1" avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/RGeneral.png" />
 			<Timer ref={redTimerRef} timercolor="red" currentUser={currentPlayer} setLoser={setLoser} />
-			<Username timercolor="red" currentUser={currentPlayer} />
 			<div className="chess-board">
 				{board.map((row, i) =>
 					row.map((piece, j) => {
@@ -504,8 +504,9 @@ const GameBoard = () => {
 					})
 				)}
 			</div>
+			
 			<Timer ref={blackTimerRef} timercolor="black" currentUser={currentPlayer} setLoser={setLoser} />
-			<Username timercolor="black" currentUser={currentPlayer} />
+			<Username color="black" playerName="Player 2" avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/BGeneral.png" />
 		</div>
 	);
 };
