@@ -504,8 +504,9 @@ const GameBoard = () => {
 					})
 				)}
 			</div>
-			<Timer ref={blackTimerRef} timercolor="black" currentUser={currentPlayer} setLoser={setLoser} />
 			<Username timercolor="black" currentUser={currentPlayer} />
+			<Timer ref={blackTimerRef} timercolor="black" currentUser={currentPlayer} setLoser={setLoser} />
+			
 		</div>
 	);
 };
