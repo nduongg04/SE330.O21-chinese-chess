@@ -475,9 +475,22 @@ const GameBoard = () => {
 		}
 	};
 
+	const getUserRed= ()=>{
+		if(matchData?.user1?.color == "red"){
+			return matchData?.user1?.user?.username
+		}
+		return matchData?.user2?.user?.username
+	}
+
+	const getUserBlack= ()=>{
+		if(matchData?.user1?.color == "black"){
+			return matchData?.user1?.user?.username
+		}
+		return matchData?.user2?.user?.username
+	}
 	return (
 		<div className="container">	
-			<Username color="red" playerName={matchData} avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/RGeneral.png" />
+			<Username color="red" playerName={getUserRed()} avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/RGeneral.png" />
 			<Timer ref={redTimerRef} timercolor="red" currentUser={currentPlayer} setLoser={setLoser} />
 			<div className="chess-board">
 				{board.map((row, i) =>
@@ -506,7 +519,7 @@ const GameBoard = () => {
 			</div>
 			
 			<Timer ref={blackTimerRef} timercolor="black" currentUser={currentPlayer} setLoser={setLoser} />
-			<Username color="black" playerName="Player 2" avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/BGeneral.png" />
+			<Username color="black" playerName={getUserBlack()} avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/BGeneral.png" />
 		</div>
 	);
 };
