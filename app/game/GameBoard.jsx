@@ -425,7 +425,6 @@ const GameBoard = () => {
 				//Highlight the valid moves
 				validMoves = getValidMoves(selectedPiece, board);
 				validMoves = filterCheckMoves(currentPlayer, validMoves, selectedPiece);
-				console.log("filter here:", validMoves);
 				if (validMoves.length === 0) {
 					isSelected = false;
 					selectedPiece = null;
@@ -443,7 +442,6 @@ const GameBoard = () => {
 				const x = parseInt(parts[1]);
 				const y = parseInt(parts[2]);
 				let position = { x: x, y: y };
-				console.log(position);
 				const isValidMove = validMoves.some(
 					(move) => position.x === move.x && position.y === move.y
 				);
@@ -458,7 +456,6 @@ const GameBoard = () => {
 		) {
 			isSelected = true;
 			selectedPiece = board[x][y];
-			console.log(selectedPiece);
 			//Highlight the valid moves
 			validMoves = getValidMoves(selectedPiece, board);
 			validMoves = filterCheckMoves(currentPlayer, validMoves, selectedPiece);

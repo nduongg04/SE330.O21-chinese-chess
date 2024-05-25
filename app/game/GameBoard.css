@@ -18,6 +18,7 @@
 .cell {
   width: 60px;
   height: 60px;
+  align-items: center;
   border-radius: 50%;
 }
 
@@ -37,11 +38,11 @@
 .cell.valid-move {
   width: 60px;
   height: 60px;
-  align-items: flex-start;
+  align-items: center;
   border-radius: 50%;
   opacity: 0.5;
   background-color: rgb(78, 78, 243);
 }
-.cell.valid-move :hover {
+.cell.valid-move:hover {
   background-color:rgb(79, 241, 100);
 }
