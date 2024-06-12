@@ -425,7 +425,6 @@ const GameBoard = () => {
 				//Highlight the valid moves
 				validMoves = getValidMoves(selectedPiece, board);
 				validMoves = filterCheckMoves(currentPlayer, validMoves, selectedPiece);
-				console.log("filter here:", validMoves);
 				if (validMoves.length === 0) {
 					isSelected = false;
 					selectedPiece = null;
@@ -443,7 +442,6 @@ const GameBoard = () => {
 				const x = parseInt(parts[1]);
 				const y = parseInt(parts[2]);
 				let position = { x: x, y: y };
-				console.log(position);
 				const isValidMove = validMoves.some(
 					(move) => position.x === move.x && position.y === move.y
 				);
@@ -458,7 +456,6 @@ const GameBoard = () => {
 		) {
 			isSelected = true;
 			selectedPiece = board[x][y];
-			console.log(selectedPiece);
 			//Highlight the valid moves
 			validMoves = getValidMoves(selectedPiece, board);
 			validMoves = filterCheckMoves(currentPlayer, validMoves, selectedPiece);
@@ -475,9 +472,22 @@ const GameBoard = () => {
 		}
 	};
 
+	const getUserRed= ()=>{
+		if(matchData?.user1?.color == "red"){
+			return matchData?.user1?.user?.username
+		}
+		return matchData?.user2?.user?.username
+	}
+
+	const getUserBlack= ()=>{
+		if(matchData?.user1?.color == "black"){
+			return matchData?.user1?.user?.username
+		}
+		return matchData?.user2?.user?.username
+	}
 	return (
 		<div className="container">	
-			<Username color="red" playerName="Player 1" avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/RGeneral.png" />
+			<Username color="red" playerName={getUserRed()} avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/RGeneral.png" />
 			<Timer ref={redTimerRef} timercolor="red" currentUser={currentPlayer} setLoser={setLoser} />
 			<div className="chess-board">
 				{board.map((row, i) =>
@@ -506,7 +516,7 @@ const GameBoard = () => {
 			</div>
 			
 			<Timer ref={blackTimerRef} timercolor="black" currentUser={currentPlayer} setLoser={setLoser} />
-			<Username color="black" playerName="Player 2" avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/BGeneral.png" />
+			<Username color="black" playerName={getUserBlack()} avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/BGeneral.png" />
 		</div>
 	);
 };
