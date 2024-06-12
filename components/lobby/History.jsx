@@ -57,7 +57,7 @@ const History = () => {
 			if (data === null) {
 				const newAccessToken = await getAccessToken(refreshToken);
 				if (newAccessToken === null) {
-					router.push("/login");
+					router.replace("/login");
 					return;
 				}
 				localStorage.setItem("accessToken", newAccessToken);

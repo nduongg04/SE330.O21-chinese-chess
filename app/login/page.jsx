@@ -37,10 +37,10 @@ const Login = () => {
 	const handleSubmit = async (event) => {
 		event.preventDefault();
 		setIsLoading(true);
+
 		const resultPingSocket = await fetch("https://chinesechess-socket.onrender.com/ping", {
 			method: "GET",
 		});
-
         console.log(resultPingSocket)
 
 		try {
