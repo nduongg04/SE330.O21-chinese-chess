@@ -141,7 +141,7 @@ const NewGame = () => {
 					isFinding
 						? "bg-red-500 hover:bg-red-600"
 						: "bg-green-400 hover:bg-green-500"
-				} hover:text-xl  text-white font-semibold text-lg`}
+				} transition hover:text-xl  text-white font-semibold text-lg`}
 				onClick={handleClickPlay}
 			>
 				{textPlayButton}
