@@ -28,7 +28,7 @@ const GameBoard = () => {
     [null, null, null, null, null, null, null, null, null],
     ['chariot', 'horse', 'elephant', 'advisor', 'general', 'advisor', 'elephant', 'horse', 'chariot'],
   ].map((row, rowIndex) => row.map((piece, colIndex) => {
-    const color = rowIndex < 5 ? 'red' : 'black';
+    const color = rowIndex < 5 ? opponentPlayer : currentPlayer;
     return piece ? { type: piece, position: {x: rowIndex, y: colIndex}, color: color} : null;
   })));
 
@@ -53,7 +53,7 @@ const GameBoard = () => {
 		return matchData?.user2?.color;
 	};
 	const currentPlayer = myColor();
-
+	const opponentPlayer = currentPlayer === "red" ? "black" : "red";
 	const socketIDOponent = () => {
 		console.log(matchData);
 		if (matchData === null) return;
@@ -475,14 +475,14 @@ const GameBoard = () => {
 	};
 
 	const getUserRed= ()=>{
-		if(matchData?.user1?.color == "red"){
+		if(matchData?.user1?.color == opponentPlayer){
 			return matchData?.user1?.user?.username
 		}
 		return matchData?.user2?.user?.username
 	}
 
 	const getUserBlack= ()=>{
-		if(matchData?.user1?.color == "black"){
+		if(matchData?.user1?.color == currentPlayer){
 			return matchData?.user1?.user?.username
 		}
 		return matchData?.user2?.user?.username
