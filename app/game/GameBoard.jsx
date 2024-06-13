@@ -102,7 +102,7 @@ const GameBoard = () => {
 		}
 		return matchData?.user2?.color;
 	};
-	const currentPlayer = myColor();
+	const [currentPlayer, setCurrentPlayer] = useState(myColor());
 	const opponentPlayer = currentPlayer === "red" ? "black" : "red";
 	const socketIDOponent = () => {
 		console.log(matchData);
@@ -528,40 +528,23 @@ const GameBoard = () => {
 		}
 		return matchData?.user2?.user?.username;
 	};
-    console.log(currentPlayer);
+	console.log(currentPlayer);
 	return (
 		<div className={`container`}>
-			{currentPlayer === "red" ? (
-				<>
-					<Timer
-						ref={blackTimerRef}
-						timercolor="black"
-						currentUser={currentPlayer}
-						setLoser={setLoser}
-					/>
-					<Username
-						color="black"
-						playerName={getUserBlack()}
-						avatar="/assets/PlayerAvatar.png"
-						pieceImage="/assets/piece_assets/BGeneral.png"
-					/>
-				</>
-			) : (
-				<>
-					<Username
-						color="red"
-						playerName={getUserRed()}
-						avatar="/assets/PlayerAvatar.png"
-						pieceImage="/assets/piece_assets/RGeneral.png"
-					/>
-					<Timer
-						ref={redTimerRef}
-						timercolor="red"
-						currentUser={currentPlayer}
-						setLoser={setLoser}
-					/>{" "}
-				</>
-			)}
+			<Timer
+				ref={blackTimerRef}
+				timercolor="black"
+				currentUser={currentPlayer}
+				setLoser={setLoser}
+			/>
+			<Username
+				currentPlayer={currentPlayer}
+				color="black"
+				playerName={getUserBlack()}
+				avatar="/assets/PlayerAvatar.png"
+				pieceImage="/assets/piece_assets/BGeneral.png"
+			/>
+
 			<div
 				className={`chess-board ${currentPlayer === "red" ? "rotate-180" : ""}`}
 			>
@@ -591,37 +574,19 @@ const GameBoard = () => {
 					})
 				)}
 			</div>
-			{currentPlayer === "red" ? (
-				<>
-					<Username
-						color="red"
-						playerName={getUserRed()}
-						avatar="/assets/PlayerAvatar.png"
-						pieceImage="/assets/piece_assets/RGeneral.png"
-					/>
-					<Timer
-						ref={redTimerRef}
-						timercolor="red"
-						currentUser={currentPlayer}
-						setLoser={setLoser}
-					/>{" "}
-				</>
-			) : (
-				<>
-					<Timer
-						ref={blackTimerRef}
-						timercolor="black"
-						currentUser={currentPlayer}
-						setLoser={setLoser}
-					/>
-					<Username
-						color="black"
-						playerName={getUserBlack()}
-						avatar="/assets/PlayerAvatar.png"
-						pieceImage="/assets/piece_assets/BGeneral.png"
-					/>
-				</>
-			)}
+			<Username
+				currentPlayer={currentPlayer}
+				color="red"
+				playerName={getUserRed()}
+				avatar="/assets/PlayerAvatar.png"
+				pieceImage="/assets/piece_assets/RGeneral.png"
+			/>
+			<Timer
+				ref={redTimerRef}
+				timercolor="red"
+				currentUser={currentPlayer}
+				setLoser={setLoser}
+			/>
 		</div>
 	);
 };
