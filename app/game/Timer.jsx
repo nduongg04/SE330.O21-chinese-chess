@@ -78,7 +78,7 @@ const Timer = React.forwardRef((props, ref) => {
 	}));
 
 	return (
-		<div className={`timer ${timercolor === "red" ? "top-0" : "bottom-0"}`}>
+		<div className={`timer ${timercolor === currentUser ? 'bottom-0' : 'top-0'}`}>
 			<div>
 				{`${time.minutes < 10 ? "0" : ""}${time.minutes}:${
 					time.seconds < 10 ? "0" : ""
