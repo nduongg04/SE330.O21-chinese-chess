@@ -103,7 +103,7 @@ const GameBoard = () => {
 		return matchData?.user2?.color;
 	};
 	const currentPlayer = myColor();
-
+	const opponentPlayer = currentPlayer === "red" ? "black" : "red";
 	const socketIDOponent = () => {
 		console.log(matchData);
 		if (matchData === null) return;
