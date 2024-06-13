@@ -63,8 +63,8 @@
       // Kiểm tra xem vị trí mới có nằm trong bàn cờ không
       if (newX >= 0 && newX < board.length && newY >= 0 && newY < board[0].length) {
         // Kiểm tra xem vị trí mới có nằm trong cung điện không
-        if ((color === 'red' && newX >= 0 && newX <= 2 && newY >= 3 && newY <= 5) || 
-            (color === 'black' && newX >= 7 && newX <= 9 && newY >= 3 && newY <= 5)) {
+        if ((color === 'black' && newX >= 0 && newX <= 2 && newY >= 3 && newY <= 5) || 
+            (color === 'red' && newX >= 7 && newX <= 9 && newY >= 3 && newY <= 5)) {
           // Kiểm tra xem ô đó có trống hoặc có quân cờ của đối phương không
           if (board[newX][newY] === null || board[newX][newY].color !== color) {
             validMoves.push({x: newX, y: newY});
@@ -112,15 +112,15 @@
    if (type === 'soldier') {
     // Logic for soldier movement
     // Check the cell in front
-    if (color === 'red' && position.x < board.length - 1 && (board[position.x + 1][position.y] === null || board[position.x + 1][position.y].color !== color)) {
+    if (color === 'black' && position.x < board.length - 1 && (board[position.x + 1][position.y] === null || board[position.x + 1][position.y].color !== color)) {
       validMoves.push({x: position.x + 1, y: position.y});
     }
-    if (color === 'black' && position.x > 0 && (board[position.x - 1][position.y] === null || board[position.x - 1][position.y].color !== color)) {
+    if (color === 'red' && position.x > 0 && (board[position.x - 1][position.y] === null || board[position.x - 1][position.y].color !== color)) {
       validMoves.push({x: position.x - 1, y: position.y});
     }
   
     // If the soldier has crossed the river, check the cells to the sides
-    if ((color === 'red' && position.x > 4) || (color === 'black' && position.x < 5)) {
+    if ((color === 'black' && position.x > 4) || (color === 'red' && position.x < 5)) {
       if (position.y > 0 && (board[position.x][position.y - 1] === null || board[position.x][position.y - 1].color !== color)) {
         validMoves.push({x: position.x, y: position.y - 1});
       }
@@ -156,7 +156,7 @@
           const newRow = position.x + delta[0];
           const newCol = position.y + delta[1];
           // Kiểm tra xem quân tượng có đang cố gắng đi qua sông không
-          if ((color === 'red' && newRow >= 5) || (color === 'black' && newRow < 5)) {
+          if ((color === 'black' && newRow >= 5) || (color === 'red' && newRow < 5)) {
               continue;
           }
           if (newRow >= 0 && newRow < board.length && newCol >= 0 && newCol < board[0].length && (board[newRow][newCol] === null || board[newRow][newCol].color !== color)) {
@@ -178,7 +178,7 @@
         const newRow = position.x + delta[0];
         const newCol = position.y + delta[1];
         // Kiểm tra xem quân tướng có đang cố gắng di chuyển ra khỏi cung điện không
-        if ((color === 'red' && newRow >= 0 && newRow <= 2 && newCol >= 3 && newCol <= 5) || (color === 'black' && newRow >= 7 && newRow <= 9 && newCol >= 3 && newCol <= 5)) {
+        if ((color === 'black' && newRow >= 0 && newRow <= 2 && newCol >= 3 && newCol <= 5) || (color === 'red' && newRow >= 7 && newRow <= 9 && newCol >= 3 && newCol <= 5)) {
           if (board[newRow][newCol] === null || board[newRow][newCol].color !== color) {
             validMoves.push({x: newRow, y: newCol});   
           }
