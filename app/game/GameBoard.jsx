@@ -278,6 +278,7 @@ const GameBoard = () => {
 				blackTimerRef.current.startTimer();
 			}
 			setBoard(newBoard);
+			audio.play();
 			setIsYourTurn(true);
 		});
 
