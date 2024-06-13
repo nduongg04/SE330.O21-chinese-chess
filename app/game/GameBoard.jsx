@@ -12,24 +12,75 @@ import Timer from "./Timer";
 import Username from "./Username";
 
 const GameBoard = () => {
+	const audio = new Audio("/audio/chess-move-audio.mp3");
 	const router = useRouter();
-	const redTimerRef = useRef()
-	const blackTimerRef = useRef()
-	const [board, setBoard] = useState([
-		['chariot', 'horse', 'elephant', 'advisor', 'general', 'advisor', 'elephant', 'horse', 'chariot'],
-		[null, null, null, null, null, null, null, null, null],
-		[null, 'cannon', null, null, null, null, null, 'cannon', null],
-		['soldier', null, 'soldier', null, 'soldier', null, 'soldier', null, 'soldier'],
-		Array(9).fill(null),
-		Array(9).fill(null),
-		['soldier', null, 'soldier', null, 'soldier', null, 'soldier', null, 'soldier'],
-		[null, 'cannon', null, null, null, null, null, 'cannon', null],
-		[null, null, null, null, null, null, null, null, null],
-		['chariot', 'horse', 'elephant', 'advisor', 'general', 'advisor', 'elephant', 'horse', 'chariot'],
-	].map((row, rowIndex) => row.map((piece, colIndex) => {
-		const color = rowIndex < 5 ? 'black' : 'red';
-		return piece ? { type: piece, position: { x: rowIndex, y: colIndex }, color: color } : null;
-	})));
+	const redTimerRef = useRef();
+	const blackTimerRef = useRef();
+	const [board, setBoard] = useState(
+		[
+			[
+				"chariot",
+				"horse",
+				"elephant",
+				"advisor",
+				"general",
+				"advisor",
+				"elephant",
+				"horse",
+				"chariot",
+			],
+			[null, null, null, null, null, null, null, null, null],
+			[null, "cannon", null, null, null, null, null, "cannon", null],
+			[
+				"soldier",
+				null,
+				"soldier",
+				null,
+				"soldier",
+				null,
+				"soldier",
+				null,
+				"soldier",
+			],
+			Array(9).fill(null),
+			Array(9).fill(null),
+			[
+				"soldier",
+				null,
+				"soldier",
+				null,
+				"soldier",
+				null,
+				"soldier",
+				null,
+				"soldier",
+			],
+			[null, "cannon", null, null, null, null, null, "cannon", null],
+			[null, null, null, null, null, null, null, null, null],
+			[
+				"chariot",
+				"horse",
+				"elephant",
+				"advisor",
+				"general",
+				"advisor",
+				"elephant",
+				"horse",
+				"chariot",
+			],
+		].map((row, rowIndex) =>
+			row.map((piece, colIndex) => {
+				const color = rowIndex < 5 ? "red" : "black";
+				return piece
+					? {
+							type: piece,
+							position: { x: rowIndex, y: colIndex },
+							color: color,
+					  }
+					: null;
+			})
+		)
+	);
 
 	const [isYourTurn, setIsYourTurn] = useState(false);
 	let [isWinner, setWinner] = useState(false);
@@ -41,7 +92,7 @@ const GameBoard = () => {
 	const matchData = useSocket((state) => state.matchData);
 	const socket = useSocket((state) => state.socket);
 	const user = useSession((state) => state.user);
-	const setMessages = useSocket((state) => state.setMessages)
+	const setMessages = useSocket((state) => state.setMessages);
 	const baseUrl = "https://se330-o21-chinese-game-be.onrender.com";
 	//
 
@@ -51,8 +102,8 @@ const GameBoard = () => {
 		}
 		return matchData?.user2?.color;
 	};
-	const currentPlayer = myColor();
-
+	const [currentPlayer, setCurrentPlayer] = useState(myColor());
+	const opponentPlayer = currentPlayer === "red" ? "black" : "red";
 	const socketIDOponent = () => {
 		console.log(matchData);
 		if (matchData === null) return;
@@ -63,10 +114,8 @@ const GameBoard = () => {
 	};
 
 	if (matchData === null) {
-		router.replace("/lobby")
+		router.replace("/lobby");
 	}
-
-
 
 	useEffect(() => {
 		if (socket == null) return;
@@ -75,76 +124,73 @@ const GameBoard = () => {
 			if (matchData.user1.user.id == user.id) {
 				user2ID = matchData.user2.user.id;
 			}
-			const socketId = socketIDOponent()
+			const socketId = socketIDOponent();
 			const data = {
 				socketID: socketId,
 				user1ID: user2ID,
-				user2ID: user?.id
-			}
-			socket.emit("surrender", data)
-		}
-		window.addEventListener('beforeunload', handleBeforeUnload)
-		return () => {
-			window.removeEventListener('beforeunload', handleBeforeUnload);
+				user2ID: user?.id,
+			};
+			socket.emit("surrender", data);
 		};
-
-	}, [socket])
-
+		window.addEventListener("beforeunload", handleBeforeUnload);
+		return () => {
+			window.removeEventListener("beforeunload", handleBeforeUnload);
+		};
+	}, [socket]);
 
 	useEffect(() => {
-		setMessages([])
-		redTimerRef.current.startTimer()
+		setMessages([]);
+		redTimerRef.current.startTimer();
 		if (currentPlayer === "red") {
 			setIsYourTurn(true);
 		}
 	}, []);
 
 	useEffect(() => {
-		if (currentPlayer == 'red') {
-			console.log(redTimerRef.current.timesUp())
+		if (currentPlayer == "red") {
+			console.log(redTimerRef.current.timesUp());
 			if (redTimerRef.current.timesUp()) {
-				setLoser(true)
+				setLoser(true);
 			}
 		} else {
 			if (blackTimerRef.current.timesUp()) {
-				setLoser(true)
+				setLoser(true);
 			}
 		}
-	})
+	});
 
 	useEffect(() => {
 		if (socket == null) return;
 		socket.on("winner", (res) => {
-			console.log("winner")
-			setWinner(true)
-		})
-	}, [])
+			console.log("winner");
+			setWinner(true);
+		});
+	}, []);
 
 	useEffect(() => {
-		if (socket == null) return
+		if (socket == null) return;
 		if (isLoser == true) {
 			let user2ID = matchData.user1.user.id;
 			if (matchData.user1.user.id == user.id) {
 				user2ID = matchData.user2.user.id;
 			}
-			const socketId = socketIDOponent()
+			const socketId = socketIDOponent();
 			const data = {
 				socketID: socketId,
 				user1ID: user2ID,
-				user2ID: user?.id
-			}
-			socket.emit("surrender", data)
+				user2ID: user?.id,
+			};
+			socket.emit("surrender", data);
 		}
 
 		comeForLose();
-	}, [isLoser])
+	}, [isLoser]);
 
 	useEffect(() => {
 		// Get the opponent's color
 		const opponentColor = currentPlayer === "red" ? "black" : "red";
 		if (isCheckMate(opponentColor, board)) {
 			setLoser(true);
-
 		} else {
 			const check = isChecking(opponentColor, board);
 			if (check) {
@@ -154,11 +200,10 @@ const GameBoard = () => {
 					icon: "info",
 					title: "Check!",
 					showConfirmButton: false,
-					timer: 2000
+					timer: 2000,
 				});
 			}
 		}
-
 	}, [board]);
 
 	const comeForWin = () => {
@@ -170,7 +215,7 @@ const GameBoard = () => {
 				imageWidth: 400,
 				imageHeight: 200,
 				imageAlt: "Custom image",
-				allowOutsideClick: false
+				allowOutsideClick: false,
 			}).then((res) => {
 				if (res.isConfirmed) {
 					console.log("the winner");
@@ -181,7 +226,7 @@ const GameBoard = () => {
 			return true;
 		}
 		return false;
-	}
+	};
 
 	const comeForLose = () => {
 		if (isLoser) {
@@ -192,7 +237,7 @@ const GameBoard = () => {
 				imageWidth: 400,
 				imageHeight: 200,
 				imageAlt: "Custom image",
-				allowOutsideClick: false
+				allowOutsideClick: false,
 			}).then((result) => {
 				if (result.isConfirmed) {
 					console.log("the loser");
@@ -202,14 +247,14 @@ const GameBoard = () => {
 			return true;
 		}
 		return false;
-	}
+	};
 
 	// Check for free win
 	useEffect(() => {
 		if (isWinner) {
 			comeForWin();
 		}
-	}, [isWinner])
+	}, [isWinner]);
 
 	const handleClickSocket = (event) => {
 		// Take the turn
@@ -225,23 +270,22 @@ const GameBoard = () => {
 		console.log("Board change");
 		socket.on("getTurn", (newBoard) => {
 			console.log("Socket:", newBoard);
-			if (currentPlayer == 'red') {
-				redTimerRef.current.startTimer()
-				blackTimerRef.current.pauseTimer()
+			if (currentPlayer == "red") {
+				redTimerRef.current.startTimer();
+				blackTimerRef.current.pauseTimer();
 			} else {
-				redTimerRef.current.pauseTimer()
-				blackTimerRef.current.startTimer()
+				redTimerRef.current.pauseTimer();
+				blackTimerRef.current.startTimer();
 			}
 			setBoard(newBoard);
+			audio.play();
 			setIsYourTurn(true);
-
 		});
 
 		return () => {
 			socket.off("getTurn");
 		};
 	}, []);
-
 
 	// End Socket
 	const movePiece = (currentPosition, newPosition) => {
@@ -361,7 +405,7 @@ const GameBoard = () => {
 		validMoves = [];
 		const checkmate = isCheckMate(currentPlayer, board);
 		if (checkmate) {
-			isWinner = true
+			isWinner = true;
 			//comeForWin();
 		} else {
 			const check = isChecking(currentPlayer, board);
@@ -372,7 +416,7 @@ const GameBoard = () => {
 					icon: "success",
 					title: "Check!",
 					showConfirmButton: false,
-					timer: 2000
+					timer: 2000,
 				});
 			}
 		}
@@ -380,12 +424,12 @@ const GameBoard = () => {
 		isSelected = false;
 		setIsYourTurn(false);
 		// Post
-		if (currentPlayer == 'red') {
-			redTimerRef.current.pauseTimer()
-			blackTimerRef.current.startTimer()
+		if (currentPlayer == "red") {
+			redTimerRef.current.pauseTimer();
+			blackTimerRef.current.startTimer();
 		} else {
-			redTimerRef.current.startTimer()
-			blackTimerRef.current.pauseTimer()
+			redTimerRef.current.startTimer();
+			blackTimerRef.current.pauseTimer();
 		}
 		if (socket !== null) {
 			console.log("socket:", board);
@@ -397,7 +441,6 @@ const GameBoard = () => {
 			};
 			console.log("SBoard:", data.board);
 			socket.emit("completeTurn", data);
-
 		}
 	};
 
@@ -446,6 +489,7 @@ const GameBoard = () => {
 					(move) => position.x === move.x && position.y === move.y
 				);
 				if (isValidMove) {
+					audio.play();
 					handleOnMove(position);
 				}
 			}
@@ -474,22 +518,37 @@ const GameBoard = () => {
 
 	const getUserRed = () => {
 		if (matchData?.user1?.color == "red") {
-			return matchData?.user1?.user?.username
+			return matchData?.user1?.user?.username;
 		}
-		return matchData?.user2?.user?.username
-	}
+		return matchData?.user2?.user?.username;
+	};
 
 	const getUserBlack = () => {
 		if (matchData?.user1?.color == "black") {
-			return matchData?.user1?.user?.username
+			return matchData?.user1?.user?.username;
 		}
-		return matchData?.user2?.user?.username
-	}
+		return matchData?.user2?.user?.username;
+	};
+	console.log(currentPlayer);
 	return (
-		<div className="container">
-			<Username color="red" playerName={getUserRed()} avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/RGeneral.png" />
-			<Timer ref={redTimerRef} timercolor="red" currentUser={currentPlayer} setLoser={setLoser} />
-			<div className="chess-board">
+		<div className={`container`}>
+			<Timer
+				ref={blackTimerRef}
+				timercolor="black"
+				currentUser={currentPlayer}
+				setLoser={setLoser}
+			/>
+			<Username
+				currentPlayer={currentPlayer}
+				color="black"
+				playerName={getUserBlack()}
+				avatar="/assets/PlayerAvatar.png"
+				pieceImage="/assets/piece_assets/BGeneral.png"
+			/>
+
+			<div
+				className={`chess-board ${currentPlayer === "red" ? "rotate-180" : ""}`}
+			>
 				{board.map((row, i) =>
 					row.map((piece, j) => {
 						const isValidMove = validMoves.some(
@@ -498,7 +557,9 @@ const GameBoard = () => {
 						return (
 							<div
 								id={`cell-${i}-${j}`}
-								className={`cell ${isValidMove ? "valid-move" : ""}`}
+								className={`cell ${isValidMove ? "valid-move " : ""} ${
+									currentPlayer === "red" ? "rotate-180" : ""
+								}`}
 								onClick={handleClickSocket}
 							>
 								{piece ? (
@@ -514,9 +575,19 @@ const GameBoard = () => {
 					})
 				)}
 			</div>
-
-			<Timer ref={blackTimerRef} timercolor="black" currentUser={currentPlayer} setLoser={setLoser} />
-			<Username color="black" playerName={getUserBlack()} avatar="/assets/PlayerAvatar.png" pieceImage="/assets/piece_assets/BGeneral.png" />
+			<Username
+				currentPlayer={currentPlayer}
+				color="red"
+				playerName={getUserRed()}
+				avatar="/assets/PlayerAvatar.png"
+				pieceImage="/assets/piece_assets/RGeneral.png"
+			/>
+			<Timer
+				ref={redTimerRef}
+				timercolor="red"
+				currentUser={currentPlayer}
+				setLoser={setLoser}
+			/>
 		</div>
 	);
 };
