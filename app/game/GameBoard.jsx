@@ -12,6 +12,7 @@ import Timer from "./Timer";
 import Username from "./Username";
 
 const GameBoard = () => {
+    const audio = new Audio('/audio/chess-move-audio.mp3');
 	const router = useRouter();
 	const redTimerRef = useRef()
 	const blackTimerRef= useRef()
@@ -446,6 +447,7 @@ const GameBoard = () => {
 					(move) => position.x === move.x && position.y === move.y
 				);
 				if (isValidMove) {
+                    audio.play();
 					handleOnMove(position);
 				}
 			}
